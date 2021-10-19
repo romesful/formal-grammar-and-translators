@@ -53,6 +53,7 @@ public:
 	{
 		this->token_type = token_type;
 	}
+	virtual ~Token() = default;
 };
 
 class OperatorToken : public Token {

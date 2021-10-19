@@ -1,4 +1,2 @@
-testing + x + 5.343;
-var x := 53.77 + 0.0032;
-
-asd
+testig + 1;
+var x := -5.032;

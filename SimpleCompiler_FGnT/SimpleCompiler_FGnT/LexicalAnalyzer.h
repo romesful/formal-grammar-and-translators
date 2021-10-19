@@ -13,6 +13,7 @@ public:
 	IO_Module* io;
 	LexicalAnalyzer(const string& filename_input, const string& filename_output);
 	void parse_tokens();
+	~LexicalAnalyzer();
 //private:
 	vector<Token*> tokens;
 };

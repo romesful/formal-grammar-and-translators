@@ -142,9 +142,21 @@ void LexicalAnalyzer::parse_tokens()
 					c = io->get_next_char();
 				}
 				break;
+			default:
+				c = io->get_next_char();
 			}
 
 			tokens.push_back(new OperatorToken(ttOperator, ot));
 		}
 	} while (c != EOF);
+}
+
+LexicalAnalyzer::~LexicalAnalyzer()
+{
+	delete io;
+	for (auto t : tokens)
+	{
+		delete t;
+	}
+	tokens.clear();
 }
