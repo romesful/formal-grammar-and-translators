@@ -1,4 +1,6 @@
+#pragma once
 #include <iostream>
+
 using namespace std;
 
 enum TokenType {
@@ -8,6 +10,7 @@ enum TokenType {
 };
 
 enum OperatorType {
+	otError,
 	otPlus,					// +
 	otMinus,				// -
 	otSlash,				// / 
@@ -44,38 +47,42 @@ enum DataType {
 };
 
 class Token {
+public:
 	TokenType token_type;
 	Token(TokenType token_type)
 	{
-		this.token_type = token_type;
+		this->token_type = token_type;
 	}
 };
 
-class OperatorToken : Token {
+class OperatorToken : public Token {
+public:
 	OperatorType operator_type;
 	OperatorToken(TokenType token_type, OperatorType operator_type) : Token(token_type)
 	{
-		this.operator_type = operator_type;
+		this->operator_type = operator_type;
 	}
 };
 
-class IdentificatorToken : Token {
+class IdentificatorToken : public Token {
+public:
 	string name;
-	DataType data_type;
-	IdentificatorToken(TokenType token_type, string name, DataType data_type) : Token(token_type)
+	//DataType data_type; //mb unknown poka 4to
+	IdentificatorToken(TokenType token_type, string name/*DataType data_type*/) : Token(token_type)
 	{
-		this.name = name;
-		this.data_type = data_type;
+		this->name = name;
+		//this.data_type = data_type;
 	}
 };
 
 template<typename T>
-class ConstToken : Token {
+class ConstToken : public Token {
+public:
 	T value;
 	DataType data_type;
 	ConstToken(TokenType token_type, T value, DataType data_type) : Token(token_type)
 	{
-		this.value = value;
-		this.data_type = data_type;
+		this->value = value;
+		this->data_type = data_type;
 	}
 };

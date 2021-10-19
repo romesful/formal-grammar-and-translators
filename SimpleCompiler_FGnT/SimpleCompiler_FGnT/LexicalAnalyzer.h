@@ -1,13 +1,20 @@
 #include "IO_Module.h"
-#include "Token.h"
+#pragma once
+#include "HashTablesOfLexems.h"
 #include <vector>
-#include <unordered_map>
+#include <iostream>
+#include <string>
 
-class LexicalAnalyzer {
+using namespace std;
+
+class LexicalAnalyzer
+{
 public:
-	IO_Module io;
+	IO_Module* io;
 	LexicalAnalyzer(const string& filename_input, const string& filename_output);
 	void parse_tokens();
-private:
-	vector<Token> tokens;
+//private:
+	vector<Token*> tokens;
 };
+
+#include "LexicalAnalyzer.cpp"

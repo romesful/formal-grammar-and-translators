@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include "IO_Module.h"
+#include "LexicalAnalyzer.h"
 
 using namespace std;
 
@@ -8,12 +8,14 @@ const string PATH_OUTPUT_FILE = "C:\\Users\\ilyar\\Source\\Repos\\simple_compile
 
 int main()
 {
+	/*
 	IO_Module io(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
 	char c = ' ';
 	do
 	{
 		cout << c << endl;
-		c = io.get_next_char();
-	} while (c != EOF);
-
+		c = io->get_next_char();
+	} while (c != EOF);*/
+	LexicalAnalyzer la(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
+	la.parse_tokens();
 }
