@@ -15,7 +15,7 @@ Token* LexicalAnalyzer::get_token()
 	{
 		return nullptr;
 	}
-	// Парсинг чисел
+	// РџР°СЂСЃРёРЅРі С‡РёСЃРµР»
 	else if (c == '-' || isdigit(c))
 	{
 		string lexem(1, c);
@@ -38,9 +38,9 @@ Token* LexicalAnalyzer::get_token()
 				c = io->get_next_char();
 			}
 
-			// если число слишком длинное - все плохо
+			// РµСЃР»Рё С‡РёСЃР»Рѕ СЃР»РёС€РєРѕРј РґР»РёРЅРЅРѕРµ - РІСЃРµ РїР»РѕС…Рѕ
 
-			if (c == '.') // типа real?
+			if (c == '.') // С‚РёРїР° real?
 			{
 				lexem += c;
 				c = io->get_next_char();
@@ -49,7 +49,7 @@ Token* LexicalAnalyzer::get_token()
 					lexem += c;
 					c = io->get_next_char();
 				}
-				// если число слишком длинное - все плохо
+				// РµСЃР»Рё С‡РёСЃР»Рѕ СЃР»РёС€РєРѕРј РґР»РёРЅРЅРѕРµ - РІСЃРµ РїР»РѕС…Рѕ
 				return new ConstToken<double>(ttConst, stod(lexem), dtReal);
 			}
 			else
@@ -62,7 +62,7 @@ Token* LexicalAnalyzer::get_token()
 			return new OperatorToken(ttOperator, otMinus);
 		}
 	}
-	// Парсинг идентификаторов/операторов
+	// РџР°СЂСЃРёРЅРі РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ/РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	else if (isalpha(c))
 	{
 		string lexem(1, c);
@@ -83,12 +83,12 @@ Token* LexicalAnalyzer::get_token()
 			return new OperatorToken(ttOperator, OperatorKeyWords.at(lexem));
 		}
 	}
-	// Парсинг символов
+	// РџР°СЂСЃРёРЅРі СЃРёРјРІРѕР»РѕРІ
 	else if (c == '\'')
 	{
 		char lexem = io->get_next_char();
 		c = io->get_next_char();
-		if (c != '\'') // ошибка
+		if (c != '\'') // РѕС€РёР±РєР°
 			continue;
 		else
 		{
@@ -96,12 +96,12 @@ Token* LexicalAnalyzer::get_token()
 			return new ConstToken<char>(ttConst, lexem, dtChar);
 		}
 	}
-	// Парсинг строк
+	// РџР°СЂСЃРёРЅРі СЃС‚СЂРѕРє
 	else if (c == '"')
 	{
 		string lexem = "";
 		c = io->get_next_char();
-		// если закрытия строки не будет - ошибку как-то
+		// РµСЃР»Рё Р·Р°РєСЂС‹С‚РёСЏ СЃС‚СЂРѕРєРё РЅРµ Р±СѓРґРµС‚ - РѕС€РёР±РєСѓ РєР°Рє-С‚Рѕ
 		while (c != '"')
 		{
 			lexem += c;
@@ -110,7 +110,7 @@ Token* LexicalAnalyzer::get_token()
 
 		return new ConstToken<string>(ttConst, lexem, dtString);
 	}
-	// Парсинг небуквенных операторов
+	// РџР°СЂСЃРёРЅРі РЅРµР±СѓРєРІРµРЅРЅС‹С… РѕРїРµСЂР°С‚РѕСЂРѕРІ
 	else
 	{
 		string lexem(1, c);
