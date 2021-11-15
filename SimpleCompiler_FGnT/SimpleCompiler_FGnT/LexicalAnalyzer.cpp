@@ -89,7 +89,7 @@ Token* LexicalAnalyzer::get_token()
 		char lexem = io->get_next_char();
 		c = io->get_next_char();
 		if (c != '\'') // ошибка
-			continue;
+			throw;
 		else
 		{
 			c = io->get_next_char();

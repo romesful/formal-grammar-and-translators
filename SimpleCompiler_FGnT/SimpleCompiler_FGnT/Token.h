@@ -71,7 +71,12 @@ enum OperatorType {
 
 	otProgram,				// program
 	otFunction,				// function
-	otProcedure				// procedure
+	otProcedure,			// procedure
+
+	otInteger,				// integer
+	otReal,					// real
+	otString,				// string
+	otChar					// char
 };
 
 enum DataType {

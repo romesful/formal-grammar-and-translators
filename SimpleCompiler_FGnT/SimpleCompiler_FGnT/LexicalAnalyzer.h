@@ -1,5 +1,6 @@
-#include "IO_Module.h"
 #pragma once
+
+#include "IO_Module.h"
 #include "HashTablesOfLexems.h"
 #include <vector>
 #include <iostream>
