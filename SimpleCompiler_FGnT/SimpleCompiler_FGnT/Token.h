@@ -36,7 +36,7 @@ enum OperatorType {
 	otIf,					// if
 	otThen,					// then
 	otElse,					// else
-	otWhile					// while
+	otWhile,				// while
 };
 
 enum DataType {
@@ -68,11 +68,9 @@ public:
 class IdentificatorToken : public Token {
 public:
 	string name;
-	//DataType data_type; //mb unknown poka 4to
-	IdentificatorToken(TokenType token_type, string name/*DataType data_type*/) : Token(token_type)
+	IdentificatorToken(TokenType token_type, string name) : Token(token_type)
 	{
 		this->name = name;
-		//this.data_type = data_type;
 	}
 };
 

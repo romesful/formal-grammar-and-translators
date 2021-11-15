@@ -11,20 +11,13 @@ int main()
 	setlocale(LC_ALL, "rus");
 	setlocale(LC_NUMERIC, "eng"); // влияет на stod
 
-	/*
-	IO_Module io(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
-	char c = ' ';
-	do
-	{
-		cout << c << endl;
-		c = io->get_next_char();
-	} while (c != EOF);*/
 	LexicalAnalyzer la(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
-	la.parse_tokens();
 	IdentificatorToken* it;
 	OperatorToken* ot;
 
-	for (auto t : la.tokens)
+	Token* t;
+
+	while (t = la.get_token())
 	{
 		switch (t->token_type)
 		{
@@ -37,6 +30,7 @@ int main()
 			cout << "Оператор: " << ot->operator_type << endl;
 			break;
 		case ttConst:
+			cout << "Константа: ";
 			if (auto b = dynamic_cast<ConstToken<int>*>(t)) {
 				cout << b->value << endl;
 			}

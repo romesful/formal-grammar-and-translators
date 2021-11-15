@@ -12,10 +12,10 @@ class LexicalAnalyzer
 public:
 	IO_Module* io;
 	LexicalAnalyzer(const string& filename_input, const string& filename_output);
-	void parse_tokens();
+	Token* get_token();
 	~LexicalAnalyzer();
-//private:
-	vector<Token*> tokens;
+private:
+	char c;
 };
 
 #include "LexicalAnalyzer.cpp"
