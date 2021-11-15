@@ -4,13 +4,37 @@
 #include "Token.h"
 
 const map<string, OperatorType> OperatorKeyWords = {
-	{"var", otVar},
-	{"begin", otBegin},
-	{"end", otEnd},
 	{"if", otIf},
+	{"do", otDo},
+	{"of", otOf},
+	{"or", otOr},
+	{"in", otIn},
+	{"to", otTo},
+
+	{"end", otEnd},
+	{"var", otVar},
+	{"div", otDiv},
+	{"and", otAnd},
+	{"not", otNot},
+	{"for", otFor},
+	{"mod", otMod},
+	{"nil", otNil},
+	{"set", otSet},
+
 	{"then", otThen},
 	{"else", otElse},
-	{"while", otWhile}
+	{"case", otCase},
+	{"file", otFile},
+	{"goto", otGoto},
+	{"type", otType},
+	{"with", otWith},
+
+	{"begin", otBegin},
+	{"while", otWhile},
+	{"array", otArray},
+	{"const", otConst},
+	{"label", otLabel},
+	{"until", otUntil}				
 };
 
 const map<string, OperatorType> OperatorSymbols = {
@@ -32,7 +56,8 @@ const map<string, OperatorType> OperatorSymbols = {
 	{"(", otLeftParenthesis},
 	{")", otRightParenthesis},
 	{"[", otLeftBracket},
-	{"]", otRightBracket}
+	{"]", otRightBracket},
+	{"<>", otLessGreater}
 };
 /*
 

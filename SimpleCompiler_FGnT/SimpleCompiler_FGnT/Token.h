@@ -30,13 +30,48 @@ enum OperatorType {
 	otRightParenthesis,		// )
 	otLeftBracket,			// [
 	otRightBracket,			// ]
-	otVar,					// var
-	otBegin,				// begin
-	otEnd,					// end
+	otLessGreater,			// <>
+
 	otIf,					// if
+	otDo,					// do
+	otOf,					// of
+	otOr,					// or
+	otIn,					// in
+	otTo,					// to
+
+	otEnd,					// end
+	otVar,					// var
+	otDiv,					// div
+	otAnd,					// and
+	otNot,					// not
+	otFor,					// for
+	otMod,					// mod
+	otNil,					// nil
+	otSet,					// set
+	
 	otThen,					// then
 	otElse,					// else
+	otCase,					// case
+	otFile,					// file
+	otGoto,					// goto
+	otType,					// type
+	otWith,					// with
+
+	otBegin,				// begin
 	otWhile,				// while
+	otArray,				// array
+	otConst,				// const
+	otLabel,				// label
+	otUntil,				// until
+
+	otDownto,				// downto
+	otPacked,				// packed
+	otRecord,				// record
+	otRepeat,				// repeat
+
+	otProgram,				// program
+	otFunction,				// function
+	otProcedure				// procedure
 };
 
 enum DataType {
