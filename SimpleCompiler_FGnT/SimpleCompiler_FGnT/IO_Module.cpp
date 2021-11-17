@@ -26,7 +26,6 @@ IO_Module::IO_Module(const string& filename_input, const string& filename_output
 char IO_Module::get_next_char()
 {
 	char c = (char)input_stream.get();
-	cout << c << endl;
 	return c;
 }
 

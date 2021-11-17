@@ -34,7 +34,11 @@ const map<string, OperatorType> OperatorKeyWords = {
 	{"array", otArray},
 	{"const", otConst},
 	{"label", otLabel},
-	{"until", otUntil}
+	{"until", otUntil},
+
+	{"program", otProgram},
+	{"function", otFunction},
+	{"procedure", otProcedure},
 
 	{"integer", otInteger},
 	{"real", otReal},

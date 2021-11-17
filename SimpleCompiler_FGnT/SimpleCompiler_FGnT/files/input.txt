@@ -1,2 +1,4 @@
-testig + 1;
-var x := -5.032;
+program main;
+var x,y:integer;
+	s z,w:string;
+.

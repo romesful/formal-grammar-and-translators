@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include "LexicalAnalyzer.h"
+#include "SyntaxAnalyzer.h"
 
 using namespace std;
 
@@ -11,7 +11,11 @@ int main()
 	setlocale(LC_ALL, "rus");
 	setlocale(LC_NUMERIC, "eng"); // влияет на stod
 
-	LexicalAnalyzer la(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
+	SyntaxAnalyzer sa(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
+
+	cout << sa.check();
+
+	/*LexicalAnalyzer la(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
 	IdentificatorToken* it;
 	OperatorToken* ot;
 
@@ -39,5 +43,5 @@ int main()
 			}
 			break;
 		}
-	}
-}
+	}*/
+ }
