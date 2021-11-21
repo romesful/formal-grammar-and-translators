@@ -35,7 +35,7 @@ bool SyntaxAnalyzer::accept(TokenType token_type, bool is_necessarily)
 		current_token = la->get_token();
 	else if (is_necessarily) // выводим ошибку
 	{
-
+		syntax_analysis_result = false;
 	}
 	return result;
 }
@@ -55,7 +55,7 @@ bool SyntaxAnalyzer::accept(OperatorType operator_type, bool is_necessarily)
 	}
 	else if (is_necessarily)
 	{
-
+		syntax_analysis_result = false;
 	}
 
 	return result;
@@ -84,7 +84,7 @@ bool SyntaxAnalyzer::accept(vector<OperatorType> operator_types, bool is_necessa
 	}
 	else if (is_necessarily)
 	{
-		 
+		syntax_analysis_result = false;
 	}
 
 	return result;
@@ -281,7 +281,10 @@ void SyntaxAnalyzer::functions_section() // <раздел процедур и ф
 
 void SyntaxAnalyzer::operators_section() // <оператор>::=<простой оператор>|<сложный оператор>
 {
-
+	if (simple_operator())
+		return;
+	
+	complex_operator();
 }
 
 
@@ -295,14 +298,23 @@ bool SyntaxAnalyzer::complex_operator() // <сложный оператор>::=<
 	return false;
 }
 
-bool SyntaxAnalyzer::assignment_operator() // <оператор присваивания>::=<переменная>:=<выражение>|<имя функции>:=<выражение>
+bool SyntaxAnalyzer::assignment_operator() // <оператор присваивания>::=<переменная>:=<выражение>       <имя функции>::=<имя>
 {
-	return false;
+	if (!var())
+		return false;
+
+	accept(otColon, true);
+	accept(otEqual, true);
+
+	expression();
+
+	return true;
 }
 
 bool SyntaxAnalyzer::var() // <переменная>::=<имя>|<имя>[<выражение>{,<выражение>}]
 {
-	accept(ttIdentificator, true);
+	if (!accept(ttIdentificator))
+		return false;
 
 	if (accept(otLeftBracket))
 	{
@@ -388,5 +400,24 @@ bool SyntaxAnalyzer::term() // <слагаемое>::=<множитель>{<му
 
 bool SyntaxAnalyzer::factor() // <множитель>::=<переменная>|<константа>|(<выражение>)|<обозначение функции>|<множество>|not <множитель>
 {
+	if (accept(ttIdentificator))
+		return true;
+	if (accept(ttConst))
+		return true;
+	if (accept(otLeftParenthesis))
+	{
+		expression();
+		accept(otRightParenthesis, true);
+		return true;
+	}
+	if (1) // множество
+		return true;
+
+	if (accept(otNot, true))
+	{
+		factor();
+		return true;
+	}
+
 	return false;
 }
