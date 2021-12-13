@@ -1,1 +1,8 @@
-program main;
+program mfdsain;
+var x5:char;
+begin
+	x:=1 + 5;
+	5:=5
+end
+
+i?iioneaai oieaiu ai eiioa naeoee ia?aiaiiuo - ai ooieoee eee i?ioaao?u eee aeiea iia?aoi?ia

@@ -1,14 +1,15 @@
 ﻿#include "SyntaxAnalyzer.h"
 
-SyntaxAnalyzer::SyntaxAnalyzer(const string& filename_input, const string& filename_output)
+SyntaxAnalyzer::SyntaxAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler)
 {
-	la = new LexicalAnalyzer(filename_input, filename_output);
-	current_token = la->get_token();
+	error_handler = _error_handler;
+	tokens = _tokens;
+	current_token_position = 0;
+	next_token();
 }
 
 SyntaxAnalyzer::~SyntaxAnalyzer()
 {
-	delete la;
 	delete current_token;
 }
 
@@ -26,16 +27,43 @@ void SyntaxAnalyzer::fail()
 	syntax_analysis_result = false;
 }
 
+void SyntaxAnalyzer::next_token()
+{
+	if (current_token_position == tokens.size())
+		return;
+
+	current_token = tokens[current_token_position];
+	current_token_position++;
+}
+
 bool SyntaxAnalyzer::accept(TokenType token_type, bool is_necessarily)
 {
 	bool result = true;
 	if (current_token->token_type != token_type)
 		result = false;
 	if (result)
-		current_token = la->get_token();
+		next_token();
 	else if (is_necessarily) // выводим ошибку
 	{
+		string error_text = "";
+		switch (current_token->token_type)
+		{
+			case ttIdentificator:
+				error_text = "Ожидалось имя идентификатора";
+				break;
+			case ttOperator:
+				error_text = "Ожидалось имя оператора";
+				break;
+			case ttConst:
+				error_text = "Ожидалась константа";
+				break;
+		}
+
+		error_handler->add_error(error_text, current_token->position);
+
 		syntax_analysis_result = false;
+
+		next_token();
 	}
 	return result;
 }
@@ -51,11 +79,17 @@ bool SyntaxAnalyzer::accept(OperatorType operator_type, bool is_necessarily)
 
 	if (result)
 	{
-		current_token = la->get_token();
+		next_token();
 	}
-	else if (is_necessarily)
+	else if (is_necessarily) // ошибочка вышла
 	{
-		syntax_analysis_result = false;
+		string error_text = "Ожидался оператор: " + KeyWordByOperator.find(operator_type)->second;
+
+		error_handler->add_error(error_text, current_token->position);
+
+		syntax_analysis_result = false; 
+
+		next_token();
 	}
 
 	return result;
@@ -63,28 +97,37 @@ bool SyntaxAnalyzer::accept(OperatorType operator_type, bool is_necessarily)
 
 bool SyntaxAnalyzer::accept(vector<OperatorType> operator_types, bool is_necessarily)
 {
-	bool result = true;
-	if (current_token->token_type != ttOperator)
-		result = false;
-
-	OperatorType current_type = ((OperatorToken*)current_token)->operator_type;
-
-	for (OperatorType operator_type : operator_types)
+	bool result = false;
+	if (current_token->token_type == ttOperator)
 	{
-		if (operator_type == current_type)
+		OperatorType current_type = ((OperatorToken*)current_token)->operator_type;
+
+		for (OperatorType operator_type : operator_types)
 		{
-			result = true;
-			break;
+			if (operator_type == current_type)
+			{
+				result = true;
+				break;
+			}
 		}
 	}
 
 	if (result)
 	{
-		current_token = la->get_token();
+		next_token();
 	}
 	else if (is_necessarily)
 	{
+		string error_text = "Ожидался один из операторов: ";
+
+		for (OperatorType operator_type : operator_types)
+			error_text += KeyWordByOperator.find(operator_type)->second + ", ";
+
+		error_handler->add_error(error_text, current_token->position);
+
 		syntax_analysis_result = false;
+
+		next_token();
 	}
 
 	return result;
@@ -92,49 +135,24 @@ bool SyntaxAnalyzer::accept(vector<OperatorType> operator_types, bool is_necessa
 
 void SyntaxAnalyzer::program() // <программа>::=program <имя>(<имя файла>{,<имя файла>});<блок>.
 {
-	accept(otProgram, true);
-	accept(ttIdentificator, true);
-	accept(otSemiColon, true);
+	if (!accept(otProgram, true)) return;
+	if (!accept(ttIdentificator, true)) return;
+	if (!accept(otSemiColon, true)) return;
 
 	block();
 
-	accept(otDot, true);
+	if (!accept(otDot, true)) return;
 }
 
 void SyntaxAnalyzer::block() // <блок>::=<раздел констант><раздел типов><раздел переменных><раздел процедур и функций><раздел операторов>
 {
-	constants_section();
+	//constants_section();
 	vars_section();
-	functions_section();
+	//functions_section();
 	operators_section();
 }
 
-void SyntaxAnalyzer::constants_section() // <раздел констант>::=<пусто>|const <определение константы>;{<определение константы>;}
-{
-	if (!accept(otConst))
-		return;
-
-	constant_definition();
-
-	accept(otSemiColon, true);
-
-	while (constant_definition())
-	{
-		accept(otSemiColon, true);
-	}
-}
-
-bool SyntaxAnalyzer::constant_definition()// <определение константы>::=<имя>=<константа>
-{
-	if (!accept(ttIdentificator))
-		return false;
-
-	accept(otEqual, true);
-	accept(ttConst, true);
-
-	return true;
-}
-
+// ======== Раздел переменных ========
 bool SyntaxAnalyzer::single_var_definition() // <описание однотипных переменных>::=<имя>{,<имя>}:<тип>
 {
 	if (!accept(ttIdentificator))
@@ -142,10 +160,10 @@ bool SyntaxAnalyzer::single_var_definition() // <описание однотип
 
 	while (accept(otComma))
 	{
-		accept(ttIdentificator, true);
+		if (!accept(ttIdentificator, true)) return false;
 	}
 
-	accept(otColon, true);
+	if (!accept(otColon, true)) return false;
 
 	type();
 
@@ -163,142 +181,212 @@ void SyntaxAnalyzer::vars_section() // <раздел переменных>::= va
 		return;
 
 	single_var_definition();
-	accept(otSemiColon, true);
+	if (!accept(otSemiColon, true)) return;
 
 	while (single_var_definition())
 	{
-		accept(otSemiColon, true);
+		if (!accept(otSemiColon, true)) return;
 	}
 }
 
-bool SyntaxAnalyzer::procedure_definition() // <описание процедуры>::=<заголовок процедуры><блок>
+// ======== Раздел операторов ========
+// <раздел операторов>::= <составной оператор>
+
+void SyntaxAnalyzer::operators_section()
 {
-	if (!procedure_header())
+	neccessary_compound_operator();
+}
+
+//<оператор>::=<простой оператор>|<сложный оператор>
+void SyntaxAnalyzer::operator_()
+{
+	if (!simple_operator())
+		complex_operator();
+}
+
+//<простой оператор>::=<переменная>:=<выражение>
+bool SyntaxAnalyzer::simple_operator() // *
+{
+	if (!var())
 		return false;
 
-	block();
+	if (!accept(otAssign, true)) return false;
+	expression();
 
 	return true;
 }
 
-bool SyntaxAnalyzer::function_definition()
+//<переменная>::=<имя>
+bool SyntaxAnalyzer::var()  // *
 {
-	if (!function_header())
-		return false;
-
-	block();
-
-	return true;
+	return accept(ttIdentificator);
 }
 
-bool SyntaxAnalyzer::procedure_header() // <заголовок процедуры>::= procedure <имя>;| procedure <имя>(<раздел формальных параметров>{; <раздел формальных параметров>});
+//<выражение>::=<простое выражение>|<простое выражение><операция отношения><простое выражение>
+void SyntaxAnalyzer::expression()
 {
-	if (!accept(otProcedure))
+	simple_expression();
+	if (relation_operation())
+		simple_expression();
+}
+
+//<операция отношения>::= =|<>|<|<=|>=|>
+bool SyntaxAnalyzer::relation_operation()  // *
+{
+	return accept({ otEqual, otLessGreater, otLessEqual, otGreaterEqual, otGreater });
+}
+
+//<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
+void SyntaxAnalyzer::simple_expression()
+{
+	term();
+	while (additive_operation())
+		term();
+}
+
+//<аддитивная операция>::= +|-|or
+bool SyntaxAnalyzer::additive_operation()  // *
+{
+	return accept({ otPlus, otMinus, otOr });
+}
+
+//<слагаемое>::=<множитель>{<мультипликативная операция><множитель>}
+void SyntaxAnalyzer::term()
+{
+	factor();
+	while (multiplicative_operation())
+		factor();
+}
+
+//<мультипликативная операция>::=*|/|div|mod|and
+bool SyntaxAnalyzer::multiplicative_operation()  // *
+{
+	return accept({ otStar, otSlash, otDiv, otMod, otAnd });
+}
+
+//<множитель>::=[<знак>]<переменная>|[<знак>]<константа>|[<знак>](<выражение>)|not <множитель>
+void SyntaxAnalyzer::factor()
+{
+	if (sign())
 	{
-		return false;
+		//...
 	}
 
-	accept(ttIdentificator, true);
-
-	if (accept(otSemiColon))
+	if (var())
 	{
-		return true;
+		//...
+	}
+	else if (accept(ttConst))
+	{
+		//...
 	}
 	else if (accept(otLeftParenthesis))
 	{
-		formal_parameters_section();
-
-		while (accept(otSemiColon))
-		{
-			formal_parameters_section();
-		}
-
+		expression();
 		accept(otRightParenthesis, true);
-
-		accept(otSemiColon, true);
-
-		return true;
 	}
-	
-	//ожидалось otSemiColon или otLeftParenthesis
-	fail();
-	return false;
+	else if (accept(otNot))
+	{
+		factor();
+	}
+	else
+	{
+		string error_text = "Ожидалась переменная/константа/выражение";
+		syntax_analysis_result = false;
+		error_handler->add_error(error_text, current_token->position);
+	}
+
 }
 
-bool SyntaxAnalyzer::function_header() // <заголовок функции>::= function <имя>:<тип результата>;| function <имя>(<раздел формальных параметров>{;<раздел формальных параметров>}):<тип результата>;
+//<знак>::= +|-
+bool SyntaxAnalyzer::sign()  // *
 {
-	if (!accept(otFunction))
+	return accept({ otPlus, otMinus });
+}
+
+//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>
+void SyntaxAnalyzer::complex_operator()
+{
+	if (compound_operator())
+	{
+		//...
+	}
+	else if (if_operator())
+	{
+		//...
+	}
+	else if (while_operator())
+	{
+		//...
+	}
+}
+
+//<составной оператор>::= begin <оператор>{;<оператор>} end
+bool SyntaxAnalyzer::compound_operator()  // *
+{
+	if (!accept(otBegin))
 		return false;
-	
-	accept(ttIdentificator, true);
 
-	if (accept(otColon))
+	operator_();
+
+	while (accept(otSemiColon))
 	{
-		type();
-
-		accept(otSemiColon, true);
-
-		return true;
-	}
-	else if (accept(otLeftParenthesis))
-	{
-		formal_parameters_section();
-
-		while (accept(otSemiColon))
-		{
-			formal_parameters_section();
-		}
-
-		accept(otRightParenthesis, true);
-
-		accept(otSemiColon, true);
-
-		return true;
+		operator_();
 	}
 
-	// ожидалось otColon или otLeftParenthesis
-	fail();
+	if (!accept(otEnd, true)) return false;
 
 	return true;
 }
 
-bool SyntaxAnalyzer::formal_parameters_section() // <раздел формальных параметров>::=var <группа параметров>
+//<обязательный составной оператор>::= begin <оператор>{;<оператор>} end
+void SyntaxAnalyzer::neccessary_compound_operator()  // *
 {
-	accept(otVar, true);
+	if (!accept(otBegin, true)) return;
 
-	single_var_definition();
+	operator_();
+
+	while (accept(otSemiColon))
+	{
+		operator_();
+	}
+
+	if (!accept(otEnd, true)) return;
+}
+
+//<выбирающий оператор>::= if <выражение> then <оператор>|if <выражение> then <оператор> else <оператор>
+bool SyntaxAnalyzer::if_operator()  // *
+{
+	if (!accept(otIf))
+		return false;
+
+	expression();
+	accept(otThen);
+	operator_();
+
+	if (accept(otElse))
+		operator_();
 
 	return true;
 }
 
-void SyntaxAnalyzer::functions_section() // <раздел процедур и функций>::={<описание процедуры или функции>;}
+//<оператор цикла>::= while <выражение> do <оператор>
+bool SyntaxAnalyzer::while_operator()  // *
 {
-	while (procedure_definition() || function_definition())
-	{
-		accept(otSemiColon, true);
-	}
+	if (!accept(otWhile))
+		return false;
+
+	expression();
+	if (!accept(otDo, true)) return false;
+	operator_();
+
+	return true;
 }
 
-void SyntaxAnalyzer::operators_section() // <оператор>::=<простой оператор>|<сложный оператор>
-{
-	if (simple_operator())
-		return;
-	
-	complex_operator();
-}
+/*
 
 
-bool SyntaxAnalyzer::simple_operator() // <простой оператор>::=<оператор присваивания>|<оператор процедуры>|<оператор перехода>|<пустой оператор>
-{
-	return false;
-}
-
-bool SyntaxAnalyzer::complex_operator() // <сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>|<оператор присоединения>
-{
-	return false;
-}
-
-bool SyntaxAnalyzer::assignment_operator() // <оператор присваивания>::=<переменная>:=<выражение>       <имя функции>::=<имя>
+bool SyntaxAnalyzer::assignment_operator()
 {
 	if (!var())
 		return false;
@@ -324,7 +412,7 @@ bool SyntaxAnalyzer::var() // <переменная>::=<имя>|<имя>[<выр
 		{
 			expression();
 		}
-		
+
 		accept(otRightBracket, true);
 	}
 
@@ -420,4 +508,22 @@ bool SyntaxAnalyzer::factor() // <множитель>::=<переменная>|<
 	}
 
 	return false;
-}
+}*/
+
+/*
+<раздел операторов>::=<составной оператор>
+<составной оператор>::= begin <оператор>{;<оператор>} end
+<оператор>::=<простой оператор>|<сложный оператор>
+<простой оператор>::=<переменная>:=<выражение>
+<переменная>::=<имя>
+<выражение>::=<простое выражение>|<простое выражение><операция отношения><простое выражение>
+<операция отношения>::= =|<>|<|<=|>=|>
+<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
+<аддитивная операция>::= +|-|or
+<слагаемое>::=<множитель>{<мультипликативная операция><множитель>}
+<мультипликативная операция>::=*|/|div|mod|and
+<множитель>::=[<знак>]<переменная>|<константа>|[<знак>](<выражение>)|not <множитель>
+<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>|<оператор присоединения>
+<выбирающий оператор>::= if <выражение> then <оператор>|if <выражение> then <оператор> else <оператор>
+<оператор цикла>::= while <выражение> do <оператор>
+*/

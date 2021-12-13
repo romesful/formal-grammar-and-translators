@@ -6,7 +6,8 @@ using namespace std;
 enum TokenType {
 	ttIdentificator,
 	ttOperator,
-	ttConst
+	ttConst,
+	ttUndefined
 };
 
 enum OperatorType {
@@ -74,6 +75,7 @@ enum OperatorType {
 	otProcedure,			// procedure
 
 	otInteger,				// integer
+	otBool,					// bool
 	otReal,					// real
 	otString,				// string
 	otChar					// char
@@ -83,15 +85,18 @@ enum DataType {
 	dtInt,
 	dtReal,
 	dtString,
+	dtBool,
 	dtChar
 };
 
 class Token {
 public:
 	TokenType token_type;
-	Token(TokenType token_type)
+	int position;
+	Token(TokenType token_type, int position)
 	{
 		this->token_type = token_type;
+		this->position = position;
 	}
 	virtual ~Token() = default;
 };
@@ -99,7 +104,7 @@ public:
 class OperatorToken : public Token {
 public:
 	OperatorType operator_type;
-	OperatorToken(TokenType token_type, OperatorType operator_type) : Token(token_type)
+	OperatorToken(TokenType token_type, OperatorType operator_type, int position) : Token(token_type, position)
 	{
 		this->operator_type = operator_type;
 	}
@@ -108,7 +113,7 @@ public:
 class IdentificatorToken : public Token {
 public:
 	string name;
-	IdentificatorToken(TokenType token_type, string name) : Token(token_type)
+	IdentificatorToken(TokenType token_type, string name, int position) : Token(token_type, position)
 	{
 		this->name = name;
 	}
@@ -119,7 +124,7 @@ class ConstToken : public Token {
 public:
 	T value;
 	DataType data_type;
-	ConstToken(TokenType token_type, T value, DataType data_type) : Token(token_type)
+	ConstToken(TokenType token_type, T value, DataType data_type, int position) : Token(token_type, position)
 	{
 		this->value = value;
 		this->data_type = data_type;

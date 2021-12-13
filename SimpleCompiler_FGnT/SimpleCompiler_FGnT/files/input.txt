@@ -1,4 +1,6 @@
-program main;
-var x,y:integer;
-	s,z,w:integer;
-.
+program mfdsain;
+var x5:char;
+begin
+	x:=1 + 5;
+	5:=5
+end

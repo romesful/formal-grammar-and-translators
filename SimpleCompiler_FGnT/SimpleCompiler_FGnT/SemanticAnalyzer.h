@@ -1,25 +1,38 @@
-п»ї#pragma once
+#pragma once
+#include "ErrorHandler.h"
+#include "Token.h"
+#include "Type.h"
+#include <vector>
+#include <map>
+#include <iostream>
+#include <string>
 
-#include "LexicalAnalyzer.h"
+using namespace std;
 
-class SyntaxAnalyzer
+class SemanticAnalyzer
 {
 public:
-	SyntaxAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler);
+	SemanticAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler);
+	~SemanticAnalyzer();
 
-	bool check();
-
-	~SyntaxAnalyzer();
 private:
+	int current_token_position;
+	Token* current_token;
+
 	vector<Token*> tokens;
 	ErrorHandler* error_handler;
 
-	int current_token_position;
-	Token* current_token;
-	bool syntax_analysis_result;
+	map<string, Type> variables;
+	map<DataType, Type> available_types = new map<>({ dtInt, new IntegerType() },
+													{ dtReal, new RealType() },
+													{ dtString, new StringType() },
+													{ dtBool, new BoolType() },
+													{ dtChar, new CharType() } );
 
 	void next_token();
-	void fail();
+	// приводимо ли получ значение к типу переменной
+	// 
+	Type derive(Type left, Type right);
 
 	bool accept(TokenType token_type, bool is_necessarily = false);
 	bool accept(OperatorType operator_type, bool is_necessarily = false);
@@ -53,5 +66,3 @@ private:
 	bool if_operator();
 	bool while_operator();
 };
-
-#include "SyntaxAnalyzer.cpp"

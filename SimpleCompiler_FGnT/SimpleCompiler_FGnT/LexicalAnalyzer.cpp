@@ -1,13 +1,17 @@
 #include "LexicalAnalyzer.h"
 
-LexicalAnalyzer::LexicalAnalyzer(const string& filename_input, const string& filename_output)
+LexicalAnalyzer::LexicalAnalyzer(const string& filename_input, const string& filename_output, ErrorHandler* _error_handler)
 {
+	error_handler = _error_handler;
+
 	io = new IO_Module(filename_input, filename_output);
 	c = io->get_next_char();
 }
 
 Token* LexicalAnalyzer::get_token()
 {
+	position = io->get_current_position();
+
 	while (c == ' ' || c == '\n' || c == '\r' || c == '\t')
 		c = io->get_next_char();
 
@@ -16,21 +20,22 @@ Token* LexicalAnalyzer::get_token()
 		return nullptr;
 	}
 	// Парсинг чисел
-	else if (c == '-' || isdigit(c))
+	else if (isdigit(c))
 	{
 		string lexem(1, c);
+
 		c = io->get_next_char();
-
-		if (!isdigit(c) && c == '-')
-			return new OperatorToken(ttOperator, otMinus);
-
-		if (isdigit(lexem[0]) && !isdigit(c))
-			return new ConstToken<int>(ttConst, stoi(lexem), dtInt);
-
-		lexem += c;
-
-		if (isdigit(lexem[0]))
+		while (isdigit(c))
 		{
+			lexem += c;
+			c = io->get_next_char();
+		}
+
+		// если число слишком длинное - все плохо
+
+		if (c == '.') // типа real?
+		{
+			lexem += c;
 			c = io->get_next_char();
 			while (isdigit(c))
 			{
@@ -38,28 +43,11 @@ Token* LexicalAnalyzer::get_token()
 				c = io->get_next_char();
 			}
 
-			// если число слишком длинное - все плохо
-
-			if (c == '.') // типа real?
-			{
-				lexem += c;
-				c = io->get_next_char();
-				while (isdigit(c))
-				{
-					lexem += c;
-					c = io->get_next_char();
-				}
-				// если число слишком длинное - все плохо
-				return new ConstToken<double>(ttConst, stod(lexem), dtReal);
-			}
-			else
-			{
-				return new ConstToken<int>(ttConst, stoi(lexem), dtInt);
-			}
+			return new ConstToken<double>(ttConst, stod(lexem), dtReal, position);
 		}
 		else
 		{
-			return new OperatorToken(ttOperator, otMinus);
+			return new ConstToken<int>(ttConst, stoi(lexem), dtInt, position);
 		}
 	}
 	// Парсинг идентификаторов/операторов
@@ -76,11 +64,11 @@ Token* LexicalAnalyzer::get_token()
 
 		if (OperatorKeyWords.find(lexem) == OperatorKeyWords.end())
 		{
-			return new IdentificatorToken(ttIdentificator, lexem);
+			return new IdentificatorToken(ttIdentificator, lexem, position);
 		}
 		else
 		{
-			return new OperatorToken(ttOperator, OperatorKeyWords.at(lexem));
+			return new OperatorToken(ttOperator, OperatorKeyWords.at(lexem), position);
 		}
 	}
 	// Парсинг символов
@@ -93,7 +81,7 @@ Token* LexicalAnalyzer::get_token()
 		else
 		{
 			c = io->get_next_char();
-			return new ConstToken<char>(ttConst, lexem, dtChar);
+			return new ConstToken<char>(ttConst, lexem, dtChar, position);
 		}
 	}
 	// Парсинг строк
@@ -108,7 +96,7 @@ Token* LexicalAnalyzer::get_token()
 			c = io->get_next_char();
 		}
 
-		return new ConstToken<string>(ttConst, lexem, dtString);
+		return new ConstToken<string>(ttConst, lexem, dtString, position);
 	}
 	// Парсинг небуквенных операторов
 	else
@@ -119,7 +107,7 @@ Token* LexicalAnalyzer::get_token()
 			ot = OperatorSymbols.at(lexem);
 
 		/*
-		.. | := | >= | <=
+		.. | := | >= | <= | <>
 		*/
 		switch (ot)
 		{
@@ -146,6 +134,11 @@ Token* LexicalAnalyzer::get_token()
 				ot = otLessEqual;
 				c = io->get_next_char();
 			}
+			else if (c == '>')
+			{
+				ot = otLessGreater;
+				c = io->get_next_char();
+			}
 			break;
 		case otGreater:
 			c = io->get_next_char();
@@ -159,9 +152,36 @@ Token* LexicalAnalyzer::get_token()
 			c = io->get_next_char();
 		}
 
-		return new OperatorToken(ttOperator, ot);
+		if (ot == otError)
+			return new Token(ttUndefined, position);
+
+		return new OperatorToken(ttOperator, ot, position);
 
 	}
+}
+
+int LexicalAnalyzer::get_current_position()
+{
+	return position;
+}
+
+bool LexicalAnalyzer::check()
+{
+	Token* new_token = get_token();
+	do
+	{
+		tokens.push_back(new_token);
+		new_token = get_token();
+	} while (new_token != nullptr);
+
+	tokens.push_back(new Token(ttUndefined, io->get_current_position()));
+
+	return true;
+}
+
+vector<Token*> LexicalAnalyzer::get_tokens()
+{
+	return tokens;
 }
 
 LexicalAnalyzer::~LexicalAnalyzer()
