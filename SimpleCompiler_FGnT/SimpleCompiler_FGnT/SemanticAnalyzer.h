@@ -9,11 +9,15 @@
 
 using namespace std;
 
+typedef string VarName;
+
 class SemanticAnalyzer
 {
 public:
 	SemanticAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler);
 	~SemanticAnalyzer();
+
+	void check();
 
 private:
 	int current_token_position;
@@ -22,21 +26,26 @@ private:
 	vector<Token*> tokens;
 	ErrorHandler* error_handler;
 
-	map<string, Type> variables;
-	map<DataType, Type> available_types = new map<>({ dtInt, new IntegerType() },
+	map<VarName, Type> variables;
+	map<DataType, Type> available_types = { { dtInt, new IntegerType() },
 													{ dtReal, new RealType() },
 													{ dtString, new StringType() },
 													{ dtBool, new BoolType() },
-													{ dtChar, new CharType() } );
+													{ dtChar, new CharType() } };
+	OperatorType lastOp;
 
 	void next_token();
 	// приводимо ли получ значение к типу переменной
 	// 
 	Type derive(Type left, Type right);
 
-	bool accept(TokenType token_type, bool is_necessarily = false);
-	bool accept(OperatorType operator_type, bool is_necessarily = false);
-	bool accept(vector<OperatorType> operator_types, bool is_necessarily = false);
+	void add_var(VarName name, Type dt);
+	VarName get_var_name_from_token(Token* token);
+	Type get_type_from_const_token(Token* token);
+
+	bool accept(TokenType token_type);
+	bool accept(OperatorType operator_type);
+	bool accept(vector<OperatorType> operator_types);
 
 	void program();
 
@@ -47,18 +56,17 @@ private:
 
 	bool single_var_definition();
 
-	void type();
+	Type type();
 
 	void operator_();
 	bool simple_operator();
-	bool var();
-	void expression();
+	Type expression();
 	bool relation_operation();
-	void simple_expression();
+	Type simple_expression();
 	bool additive_operation();
-	void term();
+	Type term();
 	bool multiplicative_operation();
-	void factor();
+	Type factor();
 	bool sign();
 	void complex_operator();
 	void neccessary_compound_operator();

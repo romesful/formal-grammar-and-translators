@@ -3,6 +3,7 @@
 #include "ErrorHandler.h"
 #include "LexicalAnalyzer.h"
 #include "SyntaxAnalyzer.h"
+#include "SemanticAnalyzer.h"
 
 using namespace std;
 
@@ -23,5 +24,8 @@ int main()
 	cout << sa.check();
 	cout << endl;
 	error_handler->write_info(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
+	
+	SemanticAnalyzer se_a(tokens, error_handler);
 
+	se_a.check();
 }
