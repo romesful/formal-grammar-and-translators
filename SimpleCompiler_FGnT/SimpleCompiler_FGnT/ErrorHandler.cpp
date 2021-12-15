@@ -2,6 +2,7 @@
 
 void ErrorHandler::write_info(const string& filename_input, const string& filename_output)
 {
+	//TODO: покрасивше написать
 	sort(errors.begin(), errors.end(), [](Error* a, Error* b) -> bool {return a->position < b->position; });
 	ifstream fin(filename_input);
 	ofstream fout(filename_output);
@@ -9,18 +10,19 @@ void ErrorHandler::write_info(const string& filename_input, const string& filena
 	int current_position = 0;
 	int current_error = 0;
 
+
 	do
 	{
 		int current_position_in_line = 0;
+		int tabs_count = 0;
 
 		vector<string> errors_info_in_line;
 		vector<int> errors_positions_in_line;
-		char c = ' ';
-		c = fin.get();
+		
+		char c = fin.get();
 
 		while (!fin.eof() && c != '\n')
 		{
-			
 			if (current_error < errors.size() && errors[current_error]->position == current_position)
 			{
 				errors_info_in_line.push_back(errors[current_error]->info);
@@ -29,21 +31,18 @@ void ErrorHandler::write_info(const string& filename_input, const string& filena
 			}
 
 			current_position++;
-			current_position_in_line++;
 			if (c == '\t')
 			{
-				current_position_in_line += 3;
-				fout << "   ";
+				current_position_in_line += 4;
+				tabs_count++;
+				fout << "    ";
 			}
 			else
+			{
+				current_position_in_line++;
 				fout << c;
+			}
 
-/*
-
-			current_position++;
-			current_position_in_line++;
-			if (c == '\t')
-				current_position_in_line += 3;*/
 			cout << c << "-" << current_position-1 << endl;
 			c = fin.get();
 		}
@@ -67,12 +66,16 @@ void ErrorHandler::write_info(const string& filename_input, const string& filena
 
 		int len = current_position_in_line + 1;
 
+		//for (int i = e - 1; i >= 0; i--)
+		//	errors_positions_in_line[i] -= tabs_count;
+
 		string first_line(len, ' ');
 		for (int p : errors_positions_in_line)
 			first_line[p] = '^';
 
 		first_line += '\n';
 		fout << first_line;
+
 
 		for (int i = e-1; i>=0;i--)
 		{

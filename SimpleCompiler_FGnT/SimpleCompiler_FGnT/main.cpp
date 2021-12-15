@@ -30,3 +30,4 @@ int main()
 
  	error_handler->write_info(PATH_INPUT_FILE, PATH_OUTPUT_FILE);
 }
+

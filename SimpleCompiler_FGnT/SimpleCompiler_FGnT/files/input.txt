@@ -3,6 +3,12 @@ var x:integer; y:char;
 begin
 	while not (x > -5) do
 	begin
+		if (1 > (x + (test + (1 + 'c')))) then
+		begin
+			x := -x * 5;
+			x := y + 1;
+			f := 5
+		end;
 		x := -x * 5;
 		x := y + 1;
 		f := 5

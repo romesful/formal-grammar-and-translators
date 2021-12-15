@@ -38,7 +38,7 @@ void SemanticAnalyzer::next_token()
 		get_last_position_of_operator[((OperatorToken*)current_token)->operator_type] = current_token->position;
 }
 
-Type* SemanticAnalyzer::derive(Type* left, Type* right, OperatorType last_operation)
+Type* SemanticAnalyzer::derive(Type* left, Type* right, OperatorType last_operation, int position_for_error)
 {
 	Type* result = new Type();
 	if (left->can_cast_to(right))
@@ -65,7 +65,7 @@ Type* SemanticAnalyzer::derive(Type* left, Type* right, OperatorType last_operat
 		if (last_operation != otPlus && last_operation != otEqual && last_operation != otLessGreater)
 		{
 			error_text = "Данную операцию нельзя применить к этим операндам";
-			error_handler->add_error(error_text, get_last_position_of_operator[last_operation] + 1);
+			error_handler->add_error(error_text, position_for_error);
 		}
 	}
 	else
@@ -73,7 +73,7 @@ Type* SemanticAnalyzer::derive(Type* left, Type* right, OperatorType last_operat
 		if (left->can_cast_to(available_types[dtString])|| right->can_cast_to(available_types[dtString])) // хотя бы один операнд - строковый
 		{
 			error_text = "Данную операцию нельзя применить к этим операндам";
-			error_handler->add_error(error_text, get_last_position_of_operator[last_operation] + 1);
+			error_handler->add_error(error_text, position_for_error);
 		}
 	}
 
@@ -266,7 +266,9 @@ void SemanticAnalyzer::operator_()
 //<простой оператор>::=<переменная>:=<выражение>
 bool SemanticAnalyzer::simple_operator() // *
 {
+	int mem_position = current_token->position;
 	VarName name = get_var_name_from_token(current_token);
+
 	if (!accept(ttIdentificator))
 		return false;
 
@@ -276,7 +278,7 @@ bool SemanticAnalyzer::simple_operator() // *
 	if (variables.find(name) == variables.end())
 	{
 		string error_text = "Переменная не была объявлена";
-		error_handler->add_error(error_text, current_token->position);
+		error_handler->add_error(error_text, mem_position);
 	}
 	else
 	{
@@ -284,7 +286,7 @@ bool SemanticAnalyzer::simple_operator() // *
 		{
 			// TODO: вывод ошибки
 			string error_text = "Вычисленное выражение имеет другой тип в отличие от переменной";
-			error_handler->add_error(error_text, get_last_position_of_operator[otAssign] + 1);
+			error_handler->add_error(error_text, get_last_position_of_operator[otAssign]);
 		}
 	}
 
@@ -299,8 +301,9 @@ Type* SemanticAnalyzer::expression()
 	if (relation_operation())
 	{
 		OperatorType last_operation = lastOp;
+		int position = get_last_position_of_operator[last_operation];
 		t2 = simple_expression();
-		t1 = derive(t1, t2, last_operation);
+		t1 = derive(t1, t2, last_operation, position);
 	}
 
 	return t1;
@@ -320,8 +323,9 @@ Type* SemanticAnalyzer::simple_expression()
 	while (additive_operation())
 	{
 		OperatorType last_operation = lastOp;
+		int position = get_last_position_of_operator[last_operation];
 		t2 = term();
-		t1 = derive(t1, t2, last_operation);
+		t1 = derive(t1, t2, last_operation, position);
 	}
 	return t1;
 }
@@ -340,8 +344,9 @@ Type* SemanticAnalyzer::term()
 	while (multiplicative_operation())
 	{
 		OperatorType last_operation = lastOp;
+		int position = get_last_position_of_operator[last_operation];
 		t2 = factor();
-		t1 = derive(t1, t2, last_operation);
+		t1 = derive(t1, t2, last_operation, position);
 	}
 
 	return t1;
@@ -364,12 +369,13 @@ Type* SemanticAnalyzer::factor()
 
 	VarName name = get_var_name_from_token(current_token);
 	Type* const_type = get_type_from_const_token(current_token);
+	int mem_position = current_token->position;
 	if (accept(ttIdentificator))
 	{
 		if (variables.find(name) == variables.end())
 		{
 			string error_text = "Переменная не была объявлена";
-			error_handler->add_error(error_text, current_token->position);
+			error_handler->add_error(error_text, mem_position);
 			return new Type();
 		}
 		return variables[name];
@@ -392,7 +398,7 @@ Type* SemanticAnalyzer::factor()
 		if (!t->can_cast_to(available_types[dtBool]))
 		{
 			string error_text = "Выражение должно иметь тип Bool";
-			error_handler->add_error(error_text, get_last_position_of_operator[otNot] + 1);
+			error_handler->add_error(error_text, get_last_position_of_operator[otNot]);
 			// TODO: ошибка
 		}
 

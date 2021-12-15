@@ -10,10 +10,10 @@ LexicalAnalyzer::LexicalAnalyzer(const string& filename_input, const string& fil
 
 Token* LexicalAnalyzer::get_token()
 {
-	position = io->get_current_position();
-
 	while (c == ' ' || c == '\n' || c == '\r' || c == '\t')
 		c = io->get_next_char();
+
+	position = io->get_current_position();
 
 	if (c == EOF)
 	{
