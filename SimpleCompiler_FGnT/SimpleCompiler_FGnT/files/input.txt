@@ -1,9 +1,9 @@
 program mfdsain;
 var x:integer; y:char;
 begin
-	while x > 5 do
+	while not (x > -5) do
 	begin
-		x := y + 5;
+		x := -x * 5;
 	end
 end.
 

@@ -38,7 +38,7 @@ void SemanticAnalyzer::next_token()
 		get_last_position_of_operator[((OperatorToken*)current_token)->operator_type] = current_token->position;
 }
 
-Type* SemanticAnalyzer::derive(Type* left, Type* right)
+Type* SemanticAnalyzer::derive(Type* left, Type* right, OperatorType last_operation)
 {
 	Type* result = new Type();
 	if (left->can_cast_to(right))
@@ -62,10 +62,10 @@ Type* SemanticAnalyzer::derive(Type* left, Type* right)
 	if (is_string)
 	{
 		// только +, =, <>
-		if (lastOp != otPlus && lastOp != otEqual && lastOp != otLessGreater)
+		if (last_operation != otPlus && last_operation != otEqual && last_operation != otLessGreater)
 		{
 			error_text = "ƒанную операцию нельз€ применить к этим операндам";
-			error_handler->add_error(error_text, get_last_position_of_operator[lastOp] + 1);
+			error_handler->add_error(error_text, get_last_position_of_operator[last_operation] + 1);
 		}
 	}
 	else
@@ -73,11 +73,13 @@ Type* SemanticAnalyzer::derive(Type* left, Type* right)
 		if (left->can_cast_to(available_types[dtString])|| right->can_cast_to(available_types[dtString])) // хот€ бы один операнд - строковый
 		{
 			error_text = "ƒанную операцию нельз€ применить к этим операндам";
-			error_handler->add_error(error_text, get_last_position_of_operator[lastOp] + 1);
+			error_handler->add_error(error_text, get_last_position_of_operator[last_operation] + 1);
 		}
 	}
 
-	if (lastOp == otEqual || lastOp == otLessGreater || lastOp == otLessEqual || lastOp == otGreaterEqual || lastOp == otGreater || lastOp == otOr || lastOp == otAnd)
+	if (last_operation == otEqual || last_operation == otLessGreater || last_operation == otLessEqual ||
+		last_operation == otGreaterEqual || last_operation == otGreater || last_operation == otLess ||
+		last_operation == otOr || last_operation == otAnd)
 		return available_types[dtBool];
 
 	return result;
@@ -282,7 +284,7 @@ bool SemanticAnalyzer::simple_operator() // *
 		{
 			// TODO: вывод ошибки
 			string error_text = "¬ычисленное выражение имеет другой тип в отличие от переменной";
-			error_handler->add_error(error_text, current_token->position);
+			error_handler->add_error(error_text, get_last_position_of_operator[otAssign] + 1);
 		}
 	}
 
@@ -296,8 +298,9 @@ Type* SemanticAnalyzer::expression()
 	t1 = simple_expression();
 	if (relation_operation())
 	{
+		OperatorType last_operation = lastOp;
 		t2 = simple_expression();
-		t1 = derive(t1, t2);
+		t1 = derive(t1, t2, last_operation);
 	}
 
 	return t1;
@@ -316,8 +319,9 @@ Type* SemanticAnalyzer::simple_expression()
 	t1 = term();
 	while (additive_operation())
 	{
+		OperatorType last_operation = lastOp;
 		t2 = term();
-		t1 = derive(t1, t2);
+		t1 = derive(t1, t2, last_operation);
 	}
 	return t1;
 }
@@ -335,8 +339,9 @@ Type* SemanticAnalyzer::term()
 	t1 = factor();
 	while (multiplicative_operation())
 	{
+		OperatorType last_operation = lastOp;
 		t2 = factor();
-		t1 = derive(t1, t2);
+		t1 = derive(t1, t2, last_operation);
 	}
 
 	return t1;
@@ -387,7 +392,7 @@ Type* SemanticAnalyzer::factor()
 		if (!t->can_cast_to(available_types[dtBool]))
 		{
 			string error_text = "¬ыражение должно иметь тип Bool";
-			error_handler->add_error(error_text, current_token->position);
+			error_handler->add_error(error_text, get_last_position_of_operator[otNot] + 1);
 			// TODO: ошибка
 		}
 

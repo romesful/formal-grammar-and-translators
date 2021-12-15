@@ -33,7 +33,7 @@ private:
 
 	void next_token();
 
-	Type* derive(Type* left, Type* right);
+	Type* derive(Type* left, Type* right, OperatorType last_operation);
 
 	void add_var(VarName name, Type* dt);
 	VarName get_var_name_from_token(Token* token);
