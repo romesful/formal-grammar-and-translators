@@ -68,7 +68,15 @@ Token* LexicalAnalyzer::get_token()
 		}
 		else
 		{
-			return new OperatorToken(ttOperator, OperatorKeyWords.at(lexem), position);
+			OperatorType ot = OperatorKeyWords.at(lexem);
+			if (ot == otTrue || ot == otFalse)
+			{
+				return new ConstToken<bool>(ttConst, ot, dtBool, position);
+			}
+			else
+			{
+				return new OperatorToken(ttOperator, ot, position);
+			}
 		}
 	}
 	// Парсинг символов
@@ -94,8 +102,11 @@ Token* LexicalAnalyzer::get_token()
 		{
 			lexem += c;
 			c = io->get_next_char();
+			if (c == '\n' || c == EOF)
+				break;
 		}
 
+		c = io->get_next_char();
 		return new ConstToken<string>(ttConst, lexem, dtString, position);
 	}
 	// Парсинг небуквенных операторов

@@ -2,6 +2,7 @@
 
 void ErrorHandler::write_info(const string& filename_input, const string& filename_output)
 {
+	sort(errors.begin(), errors.end(), [](Error* a, Error* b) -> bool {return a->position < b->position; });
 	ifstream fin(filename_input);
 	ofstream fout(filename_output);
 
@@ -39,7 +40,7 @@ void ErrorHandler::write_info(const string& filename_input, const string& filena
 				current_position_in_line += 3;*/
 
 			fout << c;
-			cout << c << "-" << current_position << endl;
+			cout << c << "-" << current_position-1 << endl;
 			c = fin.get();
 		}
 		if (!fin.eof())
@@ -47,15 +48,15 @@ void ErrorHandler::write_info(const string& filename_input, const string& filena
 		else
 			fout << '\n';
 
-		current_position++;
-		current_position_in_line++;
-
 		if (current_error < errors.size() && errors[current_error]->position == current_position)
 		{
 			errors_info_in_line.push_back(errors[current_error]->info);
 			errors_positions_in_line.push_back(current_position_in_line);
 			current_error++;
 		}
+
+		current_position++;
+		current_position_in_line++;
 
 		int e = errors_info_in_line.size();
 		if (!e) continue;

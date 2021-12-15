@@ -26,22 +26,18 @@ private:
 	vector<Token*> tokens;
 	ErrorHandler* error_handler;
 
-	map<VarName, Type> variables;
-	map<DataType, Type> available_types = { { dtInt, new IntegerType() },
-													{ dtReal, new RealType() },
-													{ dtString, new StringType() },
-													{ dtBool, new BoolType() },
-													{ dtChar, new CharType() } };
+	map<VarName, Type*> variables;
+	map<DataType, Type*> available_types;
+	map<OperatorType, int> get_last_position_of_operator;
 	OperatorType lastOp;
 
 	void next_token();
-	// приводимо ли получ значение к типу переменной
-	// 
-	Type derive(Type left, Type right);
 
-	void add_var(VarName name, Type dt);
+	Type* derive(Type* left, Type* right);
+
+	void add_var(VarName name, Type* dt);
 	VarName get_var_name_from_token(Token* token);
-	Type get_type_from_const_token(Token* token);
+	Type* get_type_from_const_token(Token* token);
 
 	bool accept(TokenType token_type);
 	bool accept(OperatorType operator_type);
@@ -56,17 +52,17 @@ private:
 
 	bool single_var_definition();
 
-	Type type();
+	Type* type();
 
 	void operator_();
 	bool simple_operator();
-	Type expression();
+	Type* expression();
 	bool relation_operation();
-	Type simple_expression();
+	Type* simple_expression();
 	bool additive_operation();
-	Type term();
+	Type* term();
 	bool multiplicative_operation();
-	Type factor();
+	Type* factor();
 	bool sign();
 	void complex_operator();
 	void neccessary_compound_operator();
@@ -74,3 +70,5 @@ private:
 	bool if_operator();
 	bool while_operator();
 };
+
+#include "SemanticAnalyzer.cpp"

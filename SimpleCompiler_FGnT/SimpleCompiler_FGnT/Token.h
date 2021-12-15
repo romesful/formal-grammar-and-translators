@@ -78,7 +78,10 @@ enum OperatorType {
 	otBool,					// bool
 	otReal,					// real
 	otString,				// string
-	otChar					// char
+	otChar,					// char
+
+	otTrue,					// true
+	otFalse					// false
 };
 
 enum DataType {

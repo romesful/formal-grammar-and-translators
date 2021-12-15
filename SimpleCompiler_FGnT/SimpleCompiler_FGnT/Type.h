@@ -14,60 +14,60 @@ class Type
 {
 public:
 	EType type = et_undefined;
-	Type();
-	virtual bool can_cast_to(Type another_type);
+	Type() {};
+	virtual bool can_cast_to(Type* another_type) { return false; };
 };
 
-class IntegerType : Type
+class IntegerType : public Type
 {
 public:
 	IntegerType() { type = et_intger; }
-	bool can_cast_to(Type another_type)
+	bool can_cast_to(Type* another_type)
 	{
-		return another_type.type == et_real ||
-			another_type.type == type;
+		return another_type->type == et_real ||
+			another_type->type == type;
 	}
 };
 
-class BoolType : Type
+class BoolType : public Type
 {
 public:
 	BoolType() { type = et_bool; }
-	bool can_cast_to(Type another_type)
+	bool can_cast_to(Type* another_type)
 	{
-		return another_type.type == et_real ||
-			another_type.type == et_intger  ||
-			another_type.type == et_real    ||
-			another_type.type == type;
+		return another_type->type == et_real ||
+			another_type->type == et_intger  ||
+			another_type->type == et_real    ||
+			another_type->type == type;
 	}
 };
 
-class RealType : Type
+class RealType : public Type
 {
 public:
 	RealType() { type = et_real; }
-	bool can_cast_to(Type another_type)
+	bool can_cast_to(Type* another_type)
 	{
-		return another_type.type == type;
+		return another_type->type == type;
 	}
 };
 
-class CharType : Type
+class CharType : public Type
 {
 public:
 	CharType() { type = et_char; }
-	bool can_cast_to(Type another_type)
+	bool can_cast_to(Type* another_type)
 	{
-		return another_type.type == et_string || another_type.type == type;
+		return another_type->type == et_string || another_type->type == type;
 	}
 };
 
-class StringType : Type
+class StringType : public Type
 {
 public:
 	StringType() { type = et_string; }
-	bool can_cast_to(Type another_type)
+	bool can_cast_to(Type* another_type)
 	{
-		return another_type.type == type;
+		return another_type->type == type;
 	}
 };

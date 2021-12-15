@@ -7,6 +7,13 @@ SemanticAnalyzer::SemanticAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_
 
 	current_token_position = 0;
 	next_token();
+
+
+	available_types[dtInt] = new IntegerType();
+	available_types[dtReal] = new RealType();
+	available_types[dtString] = new StringType();
+	available_types[dtBool] = new BoolType();
+	available_types[dtChar] = new CharType();
 }
 
 SemanticAnalyzer::~SemanticAnalyzer()
@@ -26,22 +33,29 @@ void SemanticAnalyzer::next_token()
 
 	current_token = tokens[current_token_position];
 	current_token_position++;
+
+	if (current_token->token_type == ttOperator)
+		get_last_position_of_operator[((OperatorToken*)current_token)->operator_type] = current_token->position;
 }
 
-Type SemanticAnalyzer::derive(Type left, Type right)
+Type* SemanticAnalyzer::derive(Type* left, Type* right)
 {
-	return Type();
+	// сделать все проверки тут?
+	return new Type();
 }
 
-void SemanticAnalyzer::add_var(varName name, Type dt)
+void SemanticAnalyzer::add_var(VarName name, Type* dt)
 {
 	if (variables.find(name) == variables.end())
 		variables[name] = dt;
 	else
-		return;
+	{
+		string error_text = "Переменная с именем `" + name + "` уже была объявлена";
+		error_handler->add_error(error_text, current_token->position);
+	}
 }
 
-varName SemanticAnalyzer::get_var_name_from_token(Token* token)
+VarName SemanticAnalyzer::get_var_name_from_token(Token* token)
 {
 	if (token->token_type != ttIdentificator)
 		return "";
@@ -49,21 +63,25 @@ varName SemanticAnalyzer::get_var_name_from_token(Token* token)
 	return ((IdentificatorToken*)token)->name;
 }
 
-Type SemanticAnalyzer::get_type_from_const_token(Token* token)
+Type* SemanticAnalyzer::get_type_from_const_token(Token* token)
 {
-	if (token->token_type != ttConst)
-		return Type();
+	if (auto ct = dynamic_cast<ConstToken<int>*>(token)) {
+		return available_types[ct->data_type];
+	}
+	else if (auto ct = dynamic_cast<ConstToken<double>*>(token)) {
+		return available_types[ct->data_type];
+	}
+	else if (auto ct = dynamic_cast<ConstToken<string>*>(token)) {
+		return available_types[ct->data_type];
+	}
+	else if (auto ct = dynamic_cast<ConstToken<char>*>(token)) {
+		return available_types[ct->data_type];
+	}
+	else if (auto ct = dynamic_cast<ConstToken<bool>*>(token)) {
+		return available_types[ct->data_type];
+	}
 
-	return available_types[((ConstToken*)token)->data_type];
-}
-
-void SemanticAnalyzer::next_token()
-{
-	if (current_token_position == tokens.size())
-		return;
-
-	current_token = tokens[current_token_position];
-	current_token_position++;
+	return new Type();
 }
 
 bool SemanticAnalyzer::accept(TokenType token_type)
@@ -89,7 +107,7 @@ bool SemanticAnalyzer::accept(OperatorType operator_type)
 
 	if (result)
 	{
-		lastOp = operatorType;
+		lastOp = operator_type;
 		next_token();
 	}
 
@@ -107,7 +125,7 @@ bool SemanticAnalyzer::accept(vector<OperatorType> operator_types)
 		{
 			if (operator_type == current_type)
 			{
-				lastOp = operatorType;
+				lastOp = operator_type;
 				result = true;
 				break;
 			}
@@ -140,7 +158,7 @@ void SemanticAnalyzer::block() // <блок>::=<раздел констант><раздел типов><разде
 // ======== Раздел переменных ========
 bool SemanticAnalyzer::single_var_definition() // <описание однотипных переменных>::=<имя>{,<имя>}:<тип>
 {
-	vector<varName> variableNames;
+	vector<VarName> variableNames;
 	
 	variableNames.push_back(get_var_name_from_token(current_token));
 	if (!accept(ttIdentificator))
@@ -154,9 +172,9 @@ bool SemanticAnalyzer::single_var_definition() // <описание однотипных переменны
 
 	accept(otColon);
 
-	Type varType = type();
+	Type* varType = type();
 
-	for (varName name : variableNames)
+	for (VarName name : variableNames)
 	{
 		add_var(name, varType);
 	}
@@ -164,16 +182,16 @@ bool SemanticAnalyzer::single_var_definition() // <описание однотипных переменны
 	return true;
 }
 
-Type SemanticAnalyzer::type() // <тип>::=integer|real|string|char
+Type* SemanticAnalyzer::type() // <тип>::=integer|real|string|char
 {
 	if (accept(otInteger))
-		return available_types[otInteger];
+		return available_types[dtInt];
 	if (accept(otReal))
-		return available_types[otReal];
+		return available_types[dtReal];
 	if (accept(otString))
-		return available_types[otString];
+		return available_types[dtString];
 	if (accept(otChar))
-		return available_types[otChar];
+		return available_types[dtChar];
 }
 
 void SemanticAnalyzer::vars_section() // <раздел переменных>::= var <описание однотипных переменных>;{<описание однотипных переменных>;} | <пусто>
@@ -207,23 +225,35 @@ void SemanticAnalyzer::operator_()
 //<простой оператор>::=<переменная>:=<выражение>
 bool SemanticAnalyzer::simple_operator() // *
 {
-	varName name = get_var_name_from_token(current_token);
+	VarName name = get_var_name_from_token(current_token);
 	if (!accept(ttIdentificator))
 		return false;
 
 	accept(otAssign);
-	Type t = expression();
+	Type* t = expression();
+
+	if (!t->can_cast_to(variables[name]))
+	{
+		// TODO: вывод ошибки
+		string error_text = "Вычисленное выражение имеет другой тип в отличие от переменной";
+		error_handler->add_error(error_text, current_token->position);
+	}
 
 	return true;
 }
 
 //<выражение>::=<простое выражение>|<простое выражение><операция отношения><простое выражение>
-Type SemanticAnalyzer::expression()
+Type* SemanticAnalyzer::expression()
 {
-	Type t;
-	t = simple_expression();
+	Type *t1, *t2;
+	t1 = simple_expression();
 	if (relation_operation())
-		t = simple_expression();
+	{
+		t2 = simple_expression();
+		t1 = derive(t1, t2);
+	}
+
+	return t1;
 }
 
 //<операция отношения>::= =|<>|<|<=|>=|>
@@ -233,12 +263,16 @@ bool SemanticAnalyzer::relation_operation()  // *
 }
 
 //<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
-Type SemanticAnalyzer::simple_expression()
+Type* SemanticAnalyzer::simple_expression()
 {
-	Type t;
-	t = term();
+	Type* t1, * t2;
+	t1 = term();
 	while (additive_operation())
-		t = term();
+	{
+		t2 = term();
+		t1 = derive(t1, t2);
+	}
+	return t1;
 }
 
 //<аддитивная операция>::= +|-|or
@@ -248,14 +282,17 @@ bool SemanticAnalyzer::additive_operation()  // *
 }
 
 //<слагаемое>::=<множитель>{<мультипликативная операция><множитель>}
-Type SemanticAnalyzer::term()
+Type* SemanticAnalyzer::term()
 {
-	Type t;
-	t = factor();
+	Type* t1, * t2;
+	t1 = factor();
 	while (multiplicative_operation())
-		t = factor();
+	{
+		t2 = factor();
+		t1 = derive(t1, t2);
+	}
 
-	return t;
+	return t1;
 }
 
 //<мультипликативная операция>::=*|/|div|mod|and
@@ -265,15 +302,15 @@ bool SemanticAnalyzer::multiplicative_operation()  // *
 }
 
 //<множитель>::=[<знак>]<переменная>|[<знак>]<константа>|[<знак>](<выражение>)|not <множитель>
-Type SemanticAnalyzer::factor()
+Type* SemanticAnalyzer::factor()
 {
 	if (sign())// можно представить как -1 * x либо 1 * x
 	{
 		//...
 	}
 
-	varName name = get_var_name_from_token(current_token);
-	Type const_type = get_type_from_const_token(current_token);
+	VarName name = get_var_name_from_token(current_token);
+	Type* const_type = get_type_from_const_token(current_token);
 	if (accept(ttIdentificator))
 	{
 		return variables[name];
@@ -284,14 +321,21 @@ Type SemanticAnalyzer::factor()
 	}
 	else if (accept(otLeftParenthesis))
 	{
-		t = expression();
+		Type* t = expression();
 		accept(otRightParenthesis);
 
 		return t;
 	}
 	else if (accept(otNot))
 	{
-		t = factor(); // возможна ошибка
+		Type* t = factor();
+
+		if (!t->can_cast_to(available_types[dtBool]))
+		{
+			string error_text = "Выражение должно иметь тип Bool";
+			error_handler->add_error(error_text, current_token->position);
+			// TODO: ошибка
+		}
 
 		return available_types[dtBool];
 	}
@@ -360,7 +404,15 @@ bool SemanticAnalyzer::if_operator()  // *
 	if (!accept(otIf))
 		return false;
 
-	Type t = expression();
+	Type* t = expression();
+
+	if (!t->can_cast_to(available_types[dtBool]))
+	{
+		string error_text = "Выражение должно иметь тип Bool";
+		error_handler->add_error(error_text, current_token->position);
+		// TODO: ошибка
+	}
+
 	accept(otThen);
 	operator_();
 
@@ -376,7 +428,14 @@ bool SemanticAnalyzer::while_operator()  // *
 	if (!accept(otWhile))
 		return false;
 
-	expression();
+	Type* t = expression();
+	if (!t->can_cast_to(available_types[dtBool]))
+	{
+		string error_text = "Выражение должно иметь тип Bool";
+		error_handler->add_error(error_text, current_token->position);
+		// TODO: ошибка
+	}
+
 	accept(otDo);
 	operator_();
 

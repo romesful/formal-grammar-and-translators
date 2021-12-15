@@ -31,6 +31,7 @@ const map<string, OperatorType> OperatorKeyWords = {
 
 	{"begin", otBegin},
 	{"while", otWhile},
+	{"do", otDo},
 	{"array", otArray},
 	{"const", otConst},
 	{"label", otLabel},
@@ -44,7 +45,9 @@ const map<string, OperatorType> OperatorKeyWords = {
 	{"bool", otBool},
 	{"real", otReal},
 	{"string", otString},
-	{"char", otChar}
+	{"char", otChar},
+	{"true", otTrue},
+	{"false", otFalse}
 };
 
 const map<string, OperatorType> OperatorSymbols = {
@@ -126,7 +129,9 @@ const map<OperatorType, string> KeyWordByOperator = {
 	{otRightParenthesis, ")"},
 	{otLeftBracket, "["},
 	{otRightBracket, "]"},
-	{otLessGreater, "<>"}
+	{otLessGreater, "<>"},
+	{otTrue, "true"},
+	{otFalse, "false"}
 };
 /*
 
