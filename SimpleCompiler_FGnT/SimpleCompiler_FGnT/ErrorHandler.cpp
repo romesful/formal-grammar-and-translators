@@ -31,15 +31,19 @@ void ErrorHandler::write_info(const string& filename_input, const string& filena
 			current_position++;
 			current_position_in_line++;
 			if (c == '\t')
+			{
 				current_position_in_line += 3;
+				fout << "   ";
+			}
+			else
+				fout << c;
+
 /*
 
 			current_position++;
 			current_position_in_line++;
 			if (c == '\t')
 				current_position_in_line += 3;*/
-
-			fout << c;
 			cout << c << "-" << current_position-1 << endl;
 			c = fin.get();
 		}

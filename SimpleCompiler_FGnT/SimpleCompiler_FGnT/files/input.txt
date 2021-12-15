@@ -4,6 +4,11 @@ begin
 	while not (x > -5) do
 	begin
 		x := -x * 5;
-	end
-end.
-
+		x := y + 1;
+		f := 5
+	end;
+	if (1 > (x + (test + (1 + 'c')))) then
+	begin
+		z := 5
+	end;
+end
