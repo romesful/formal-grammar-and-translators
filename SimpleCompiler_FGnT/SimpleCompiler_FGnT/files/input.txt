@@ -1,8 +1,9 @@
 program mfdsain;
-var x5:char;
+var x:integer; y:char;
 begin
-	x:=1 + 5;
-	while "test" do
+	while x > 5 do
 	begin
+		x := y + 5;
 	end
-end
+end.
+

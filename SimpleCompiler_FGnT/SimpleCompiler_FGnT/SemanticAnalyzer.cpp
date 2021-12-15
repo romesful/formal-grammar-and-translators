@@ -40,8 +40,47 @@ void SemanticAnalyzer::next_token()
 
 Type* SemanticAnalyzer::derive(Type* left, Type* right)
 {
-	// сделать все проверки тут?
-	return new Type();
+	Type* result = new Type();
+	if (left->can_cast_to(right))
+		result = right;
+	if (right->can_cast_to(left))
+		result = left;
+
+	bool is_string = result->can_cast_to(available_types[dtString]);
+
+	/*
+	=|<>|<|<=|>=|>
+	accept({ otEqual, otLessGreater, otLessEqual, otGreaterEqual, otGreater });
+	+|-|or
+	accept({ otPlus, otMinus, otOr });
+	*|/|div|mod|and
+	accept({ otStar, otSlash, otDiv, otMod, otAnd });
+	*/
+
+	string error_text;
+
+	if (is_string)
+	{
+		// только +, =, <>
+		if (lastOp != otPlus && lastOp != otEqual && lastOp != otLessGreater)
+		{
+			error_text = "ƒанную операцию нельз€ применить к этим операндам";
+			error_handler->add_error(error_text, get_last_position_of_operator[lastOp] + 1);
+		}
+	}
+	else
+	{
+		if (left->can_cast_to(available_types[dtString])|| right->can_cast_to(available_types[dtString])) // хот€ бы один операнд - строковый
+		{
+			error_text = "ƒанную операцию нельз€ применить к этим операндам";
+			error_handler->add_error(error_text, get_last_position_of_operator[lastOp] + 1);
+		}
+	}
+
+	if (lastOp == otEqual || lastOp == otLessGreater || lastOp == otLessEqual || lastOp == otGreaterEqual || lastOp == otGreater || lastOp == otOr || lastOp == otAnd)
+		return available_types[dtBool];
+
+	return result;
 }
 
 void SemanticAnalyzer::add_var(VarName name, Type* dt)
@@ -232,11 +271,19 @@ bool SemanticAnalyzer::simple_operator() // *
 	accept(otAssign);
 	Type* t = expression();
 
-	if (!t->can_cast_to(variables[name]))
+	if (variables.find(name) == variables.end())
 	{
-		// TODO: вывод ошибки
-		string error_text = "¬ычисленное выражение имеет другой тип в отличие от переменной";
+		string error_text = "ѕеременна€ не была объ€влена";
 		error_handler->add_error(error_text, current_token->position);
+	}
+	else
+	{
+		if (!t->can_cast_to(variables[name]))
+		{
+			// TODO: вывод ошибки
+			string error_text = "¬ычисленное выражение имеет другой тип в отличие от переменной";
+			error_handler->add_error(error_text, current_token->position);
+		}
 	}
 
 	return true;
@@ -304,7 +351,8 @@ bool SemanticAnalyzer::multiplicative_operation()  // *
 //<множитель>::=[<знак>]<переменна€>|[<знак>]<константа>|[<знак>](<выражение>)|not <множитель>
 Type* SemanticAnalyzer::factor()
 {
-	if (sign())// можно представить как -1 * x либо 1 * x
+	// TODO: сделать что-то со знаком...
+	if (sign())
 	{
 		//...
 	}
@@ -313,6 +361,12 @@ Type* SemanticAnalyzer::factor()
 	Type* const_type = get_type_from_const_token(current_token);
 	if (accept(ttIdentificator))
 	{
+		if (variables.find(name) == variables.end())
+		{
+			string error_text = "ѕеременна€ не была объ€влена";
+			error_handler->add_error(error_text, current_token->position);
+			return new Type();
+		}
 		return variables[name];
 	}
 	else if (accept(ttConst))
