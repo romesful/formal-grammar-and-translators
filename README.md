@@ -56,3 +56,6 @@ end
    ^
    Ожидался оператор: .
 ```
+
+## Отчет
+[Клик](https://github.com/romesful/formal-grammar-and-translators/blob/master/%D0%9E%D1%82%D1%87%D0%B5%D1%82.pdf)
