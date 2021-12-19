@@ -15,16 +15,11 @@ SyntaxAnalyzer::~SyntaxAnalyzer()
 
 bool SyntaxAnalyzer::check()
 {
-	syntax_analysis_result = true;
+	int errros_count = error_handler->get_errors_count();
 
 	program();
 
-	return syntax_analysis_result;
-}
-
-void SyntaxAnalyzer::fail()
-{
-	syntax_analysis_result = false;
+	return error_handler->get_errors_count() == errros_count;
 }
 
 void SyntaxAnalyzer::next_token()
@@ -61,8 +56,6 @@ bool SyntaxAnalyzer::accept(TokenType token_type, bool is_necessarily)
 
 		error_handler->add_error(error_text, current_token->position);
 
-		syntax_analysis_result = false;
-
 		next_token();
 	}
 	return result;
@@ -86,8 +79,6 @@ bool SyntaxAnalyzer::accept(OperatorType operator_type, bool is_necessarily)
 		string error_text = "Ожидался оператор: " + KeyWordByOperator.find(operator_type)->second;
 
 		error_handler->add_error(error_text, current_token->position);
-
-		syntax_analysis_result = false; 
 
 		next_token();
 	}
@@ -125,7 +116,7 @@ bool SyntaxAnalyzer::accept(vector<OperatorType> operator_types, bool is_necessa
 
 		error_handler->add_error(error_text, current_token->position);
 
-		syntax_analysis_result = false;
+		
 
 		next_token();
 	}
@@ -292,7 +283,7 @@ void SyntaxAnalyzer::factor()
 	else
 	{
 		string error_text = "Ожидалась переменная/константа/выражение";
-		syntax_analysis_result = false;
+		
 		error_handler->add_error(error_text, current_token->position);
 	}
 

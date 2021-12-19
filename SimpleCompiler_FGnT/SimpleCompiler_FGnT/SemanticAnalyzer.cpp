@@ -8,7 +8,6 @@ SemanticAnalyzer::SemanticAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_
 	current_token_position = 0;
 	next_token();
 
-
 	available_types[dtInt] = new IntegerType();
 	available_types[dtReal] = new RealType();
 	available_types[dtString] = new StringType();
@@ -21,9 +20,11 @@ SemanticAnalyzer::~SemanticAnalyzer()
 	delete error_handler;
 }
 
-void SemanticAnalyzer::check()
+bool SemanticAnalyzer::check()
 {
+	int errors_count = error_handler->get_errors_count();
 	program();
+	return error_handler->get_errors_count() == errors_count;
 }
 
 void SemanticAnalyzer::next_token()

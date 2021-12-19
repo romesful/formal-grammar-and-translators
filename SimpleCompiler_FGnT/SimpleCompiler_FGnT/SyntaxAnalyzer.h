@@ -16,10 +16,8 @@ private:
 
 	int current_token_position;
 	Token* current_token;
-	bool syntax_analysis_result;
 
 	void next_token();
-	void fail();
 
 	bool accept(TokenType token_type, bool is_necessarily = false);
 	bool accept(OperatorType operator_type, bool is_necessarily = false);

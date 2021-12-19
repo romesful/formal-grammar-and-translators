@@ -1,10 +1,10 @@
 #include "LexicalAnalyzer.h"
 
-LexicalAnalyzer::LexicalAnalyzer(const string& filename_input, const string& filename_output, ErrorHandler* _error_handler)
+LexicalAnalyzer::LexicalAnalyzer(IO_Module* _io, ErrorHandler* _error_handler)
 {
 	error_handler = _error_handler;
 
-	io = new IO_Module(filename_input, filename_output);
+	io = _io;
 	c = io->get_next_char();
 }
 
@@ -178,6 +178,7 @@ int LexicalAnalyzer::get_current_position()
 
 bool LexicalAnalyzer::check()
 {
+	int errors_count = 0;
 	Token* new_token = get_token();
 	do
 	{
@@ -187,7 +188,7 @@ bool LexicalAnalyzer::check()
 
 	tokens.push_back(new Token(ttUndefined, io->get_current_position()));
 
-	return true;
+	return error_handler->get_errors_count() == errors_count;
 }
 
 vector<Token*> LexicalAnalyzer::get_tokens()

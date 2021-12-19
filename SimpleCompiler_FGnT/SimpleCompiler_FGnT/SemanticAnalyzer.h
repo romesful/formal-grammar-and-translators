@@ -17,7 +17,7 @@ public:
 	SemanticAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler);
 	~SemanticAnalyzer();
 
-	void check();
+	bool check();
 
 private:
 	int current_token_position;
