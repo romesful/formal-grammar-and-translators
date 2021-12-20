@@ -87,7 +87,7 @@ Token* LexicalAnalyzer::get_token()
 		c = io->get_next_char();
 		if (c != '\'') // ошибка
 		{
-			string error_text = "Ожидалася символ '";
+			string error_text = "Ожидался символ '";
 			error_handler->add_error(error_text, io->get_current_position());
 		}
 		else

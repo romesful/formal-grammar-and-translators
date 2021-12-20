@@ -24,23 +24,23 @@ int main(cli::array<String ^> ^args)
 	check_result = la.check();
 	if (!check_result)
 	{
-		cout << "Íàéäåíû îøèáêè âî âðåìÿ ëåêñè÷åñêîãî àíàëèçà" << endl;
+		cout << "ÐÐ°Ð¹Ð´ÐµÐ½Ñ‹ Ð¾ÑˆÐ¸Ð±ÐºÐ¸ Ð²Ð¾ Ð²Ñ€ÐµÐ¼Ñ Ð»ÐµÐºÑÐ¸Ñ‡ÐµÑÐºÐ¾Ð³Ð¾ Ð°Ð½Ð°Ð»Ð¸Ð·Ð°" << endl;
 	}
 
-	// Ñïàðñåííûå òîêåíû âî âðåìÿ ëåêñè÷åñêîãî àíàëèçà
+	// Ð¡Ð¿Ð°Ñ€ÑÐµÐ½Ð½Ñ‹Ðµ Ñ‚Ð¾ÐºÐµÐ½Ñ‹ Ð²Ð¾ Ð²Ñ€ÐµÐ¼Ñ Ð»ÐµÐºÑÐ¸Ñ‡ÐµÑÐºÐ¾Ð³Ð¾ Ð°Ð½Ð°Ð»Ð¸Ð·Ð°
 	auto tokens = la.get_tokens();
 	SyntaxAnalyzer sa(tokens, error_handler);
 	check_result = sa.check();
 	if (!check_result)
 	{
-		cout << "Íàéäåíû îøèáêè âî âðåìÿ ñèíòàêñè÷åñêîãî àíàëèçà" << endl;
+		cout << "ÐÐ°Ð¹Ð´ÐµÐ½Ñ‹ Ð¾ÑˆÐ¸Ð±ÐºÐ¸ Ð²Ð¾ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¸Ð½Ñ‚Ð°ÐºÑÐ¸Ñ‡ÐµÑÐºÐ¾Ð³Ð¾ Ð°Ð½Ð°Ð»Ð¸Ð·Ð°" << endl;
 	}
 
 	SemanticAnalyzer se_a(tokens, error_handler);
 	check_result = se_a.check();
 	if (!check_result)
 	{
-		cout << "Íàéäåíû îøèáêè âî âðåìÿ ñåìàíòè÷åñêîãî àíàëèçà" << endl;
+		cout << "ÐÐ°Ð¹Ð´ÐµÐ½Ñ‹ Ð¾ÑˆÐ¸Ð±ÐºÐ¸ Ð²Ð¾ Ð²Ñ€ÐµÐ¼Ñ ÑÐµÐ¼Ð°Ð½Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ð³Ð¾ Ð°Ð½Ð°Ð»Ð¸Ð·Ð°" << endl;
 	}
 
 	if (error_handler->get_errors_count() != 0)

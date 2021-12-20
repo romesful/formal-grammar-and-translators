@@ -15,22 +15,22 @@ Translator::Translator(vector<Token*> _tokens)
 	String^ methodName = "Main";
 
 
-	//Уникальный идентификатор сборки
+	//РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЃР±РѕСЂРєРё
 	AssemblyName^ name = gcnew AssemblyName(assemblyName);
 
-	//Домен приложения
+	//Р”РѕРјРµРЅ РїСЂРёР»РѕР¶РµРЅРёСЏ
 	AppDomain^ domain = Threading::Thread::GetDomain();
 
-	//Определяет и представляет динамическую сборку
+	//РћРїСЂРµРґРµР»СЏРµС‚ Рё РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ РґРёРЅР°РјРёС‡РµСЃРєСѓСЋ СЃР±РѕСЂРєСѓ
 	AssemblyBuilder^ builder = domain->DefineDynamicAssembly(name, AssemblyBuilderAccess::RunAndSave);
 
-	//Определяет и представляет модуль в динамической сборке
+	//РћРїСЂРµРґРµР»СЏРµС‚ Рё РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ РјРѕРґСѓР»СЊ РІ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ СЃР±РѕСЂРєРµ
 	ModuleBuilder^ module = builder->DefineDynamicModule(modName, true);
 
-	//Определяет и создает новые экземпляры классов во время выполнения
+	//РћРїСЂРµРґРµР»СЏРµС‚ Рё СЃРѕР·РґР°РµС‚ РЅРѕРІС‹Рµ СЌРєР·РµРјРїР»СЏСЂС‹ РєР»Р°СЃСЃРѕРІ РІРѕ РІСЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ
 	TypeBuilder^ typeBuilder = module->DefineType(typeName, TypeAttributes::Public);
 
-	//Определяет и представляет метод для динамического класса
+	//РћРїСЂРµРґРµР»СЏРµС‚ Рё РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ РјРµС‚РѕРґ РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ РєР»Р°СЃСЃР°
 	MethodBuilder^ methodBuilder = typeBuilder->DefineMethod(methodName, MethodAttributes::Static
 		| MethodAttributes::Public, void::typeid, gcnew cli::array<Type^>{});
 
@@ -73,7 +73,7 @@ Translator::Translator(vector<Token*> _tokens)
 	program();
 	// end generate
 
-	// чтобы консоль не сразу закрывалась
+	// С‡С‚РѕР±С‹ РєРѕРЅСЃРѕР»СЊ РЅРµ СЃСЂР°Р·Сѓ Р·Р°РєСЂС‹РІР°Р»Р°СЃСЊ
 	il_generator->EmitWriteLine(convert_to_managed_string("Press any button..."));
 	auto readln_method = Console::typeid->GetMethod("ReadLine", gcnew cli::array<Type^>{});
 	il_generator->Emit(OpCodes::Call, readln_method);
@@ -87,7 +87,7 @@ Translator::Translator(vector<Token*> _tokens)
 
 	Type^ myClass = typeBuilder->CreateType();
 
-	//Сохраняем в *.exe
+	//РЎРѕС…СЂР°РЅСЏРµРј РІ *.exe
 	builder->Save(modName);
 }
 
@@ -249,7 +249,7 @@ void Translator::emit_by_operation(OperatorType op)
 	}
 }
 
-void Translator::program() // <программа>::=program <имя>(<имя файла>{,<имя файла>});<блок>.
+void Translator::program() // <РїСЂРѕРіСЂР°РјРјР°>::=program <РёРјСЏ>(<РёРјСЏ С„Р°Р№Р»Р°>{,<РёРјСЏ С„Р°Р№Р»Р°>});<Р±Р»РѕРє>.
 {
 	accept(otProgram);
 	accept(ttIdentificator);
@@ -265,14 +265,14 @@ String^ Translator::convert_to_managed_string(string str)
 	return marshal_as<String^>(str);
 }
 
-void Translator::block() // <блок>::=<раздел констант><раздел типов><раздел переменных><раздел процедур и функций><раздел операторов>
+void Translator::block() // <Р±Р»РѕРє>::=<СЂР°Р·РґРµР» РєРѕРЅСЃС‚Р°РЅС‚><СЂР°Р·РґРµР» С‚РёРїРѕРІ><СЂР°Р·РґРµР» РїРµСЂРµРјРµРЅРЅС‹С…><СЂР°Р·РґРµР» РїСЂРѕС†РµРґСѓСЂ Рё С„СѓРЅРєС†РёР№><СЂР°Р·РґРµР» РѕРїРµСЂР°С‚РѕСЂРѕРІ>
 {
 	vars_section();
 	operators_section();
 }
 
-// ======== Раздел переменных ========
-bool Translator::single_var_definition() // <описание однотипных переменных>::=<имя>{,<имя>}:<тип>
+// ======== Р Р°Р·РґРµР» РїРµСЂРµРјРµРЅРЅС‹С… ========
+bool Translator::single_var_definition() // <РѕРїРёСЃР°РЅРёРµ РѕРґРЅРѕС‚РёРїРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…>::=<РёРјСЏ>{,<РёРјСЏ>}:<С‚РёРї>
 {
 	List<String^> variableNames;
 
@@ -338,7 +338,7 @@ void Translator::call_readln(Token* token)
 	il_generator->Emit(OpCodes::Stloc, lb);
 }
 
-Type^ Translator::type() // <тип>::=integer|real|string|char
+Type^ Translator::type() // <С‚РёРї>::=integer|real|string|char
 {
 	if (accept(otInteger))
 		return int::typeid;
@@ -350,7 +350,7 @@ Type^ Translator::type() // <тип>::=integer|real|string|char
 		return Char::typeid;
 }
 
-void Translator::vars_section() // <раздел переменных>::= var <описание однотипных переменных>;{<описание однотипных переменных>;} | <пусто>
+void Translator::vars_section() // <СЂР°Р·РґРµР» РїРµСЂРµРјРµРЅРЅС‹С…>::= var <РѕРїРёСЃР°РЅРёРµ РѕРґРЅРѕС‚РёРїРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…>;{<РѕРїРёСЃР°РЅРёРµ РѕРґРЅРѕС‚РёРїРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…>;} | <РїСѓСЃС‚Рѕ>
 {
 	accept(otVar);
 
@@ -363,8 +363,8 @@ void Translator::vars_section() // <раздел переменных>::= var <описание однотипн
 	}
 }
 
-// ======== Раздел операторов ========
-// <раздел операторов>::= <составной оператор>
+// ======== Р Р°Р·РґРµР» РѕРїРµСЂР°С‚РѕСЂРѕРІ ========
+// <СЂР°Р·РґРµР» РѕРїРµСЂР°С‚РѕСЂРѕРІ>::= <СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>
 
 void Translator::operators_section()
 {
@@ -402,14 +402,14 @@ void Translator::load_const(Token* token)
 	}
 }
 
-//<оператор>::=<простой оператор>|<сложный оператор>
+//<РѕРїРµСЂР°С‚РѕСЂ>::=<РїСЂРѕСЃС‚РѕР№ РѕРїРµСЂР°С‚РѕСЂ>|<СЃР»РѕР¶РЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ>
 void Translator::operator_()
 {
 	if (!simple_operator())
 		complex_operator();
 }
 
-//<простой оператор>::=<переменная>:=<выражение>
+//<РїСЂРѕСЃС‚РѕР№ РѕРїРµСЂР°С‚РѕСЂ>::=<РїРµСЂРµРјРµРЅРЅР°СЏ>:=<РІС‹СЂР°Р¶РµРЅРёРµ>
 bool Translator::simple_operator() // *
 {
 	int mem_position = current_token->position;
@@ -421,13 +421,13 @@ bool Translator::simple_operator() // *
 	accept(otAssign);
 	Type^ t = expression();
 
-	// кладем значение
+	// РєР»Р°РґРµРј Р·РЅР°С‡РµРЅРёРµ
 	il_generator->Emit(OpCodes::Stloc, variable_lb[name]);
 
 	return true;
 }
 
-//<выражение>::=<простое выражение>|<простое выражение><операция отношения><простое выражение>
+//<РІС‹СЂР°Р¶РµРЅРёРµ>::=<РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ>|<РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ><РѕРїРµСЂР°С†РёСЏ РѕС‚РЅРѕС€РµРЅРёСЏ><РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ>
 Type^ Translator::expression()
 {
 	Type^ t1, ^ t2;
@@ -442,13 +442,13 @@ Type^ Translator::expression()
 	return t1;
 }
 
-//<операция отношения>::= =|<>|<|<=|>=|>
+//<РѕРїРµСЂР°С†РёСЏ РѕС‚РЅРѕС€РµРЅРёСЏ>::= =|<>|<|<=|>=|>
 bool Translator::relation_operation()  // *
 {
 	return accept({ otEqual, otLessGreater, otLess, otLessEqual, otGreaterEqual, otGreater });
 }
 
-//<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
+//<РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ>::=<СЃР»Р°РіР°РµРјРѕРµ>{<Р°РґРґРёС‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ><СЃР»Р°РіР°РµРјРѕРµ>}
 Type^ Translator::simple_expression()
 {
 	Type ^t1, ^t2;
@@ -462,13 +462,13 @@ Type^ Translator::simple_expression()
 	return t1;
 }
 
-//<аддитивная операция>::= +|-|or
+//<Р°РґРґРёС‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ>::= +|-|or
 bool Translator::additive_operation()  // *
 {
 	return accept({ otPlus, otMinus, otOr });
 }
 
-//<слагаемое>::=<множитель>{<мультипликативная операция><множитель>}
+//<СЃР»Р°РіР°РµРјРѕРµ>::=<РјРЅРѕР¶РёС‚РµР»СЊ>{<РјСѓР»СЊС‚РёРїР»РёРєР°С‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ><РјРЅРѕР¶РёС‚РµР»СЊ>}
 Type^ Translator::term()
 {
 	Type^ t1, ^t2;
@@ -483,16 +483,16 @@ Type^ Translator::term()
 	return t1;
 }
 
-//<мультипликативная операция>::=*|/|div|mod|and
+//<РјСѓР»СЊС‚РёРїР»РёРєР°С‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ>::=*|/|div|mod|and
 bool Translator::multiplicative_operation()  // *
 {
 	return accept({ otStar, otSlash, otDiv, otMod, otAnd });
 }
 
-//<множитель>::=[<знак>]<переменная>|[<знак>]<константа>|[<знак>](<выражение>)|not <множитель>
+//<РјРЅРѕР¶РёС‚РµР»СЊ>::=[<Р·РЅР°Рє>]<РїРµСЂРµРјРµРЅРЅР°СЏ>|[<Р·РЅР°Рє>]<РєРѕРЅСЃС‚Р°РЅС‚Р°>|[<Р·РЅР°Рє>](<РІС‹СЂР°Р¶РµРЅРёРµ>)|not <РјРЅРѕР¶РёС‚РµР»СЊ>
 Type^ Translator::factor()
 {
-	// TODO: сделать что-то со знаком...
+	// TODO: СЃРґРµР»Р°С‚СЊ С‡С‚Рѕ-С‚Рѕ СЃРѕ Р·РЅР°РєРѕРј...
 	OperatorType mem_op = otPlus;
 	if (sign())
 	{
@@ -545,13 +545,13 @@ Type^ Translator::factor()
 
 }
 
-//<знак>::= +|-
+//<Р·РЅР°Рє>::= +|-
 bool Translator::sign()  // *
 {
 	return accept({ otPlus, otMinus });
 }
 
-//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>|<врайтлайн>
+//<СЃР»РѕР¶РЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ>::=<СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>|<РІС‹Р±РёСЂР°СЋС‰РёР№ РѕРїРµСЂР°С‚РѕСЂ>|<РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р°>|<РІСЂР°Р№С‚Р»Р°Р№РЅ>
 void Translator::complex_operator()
 {
 	if (compound_operator())
@@ -576,7 +576,7 @@ void Translator::complex_operator()
 	}
 }
 
-//<составной оператор>::= begin <оператор>{;<оператор>} end
+//<СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>::= begin <РѕРїРµСЂР°С‚РѕСЂ>{;<РѕРїРµСЂР°С‚РѕСЂ>} end
 bool Translator::compound_operator()  // *
 {
 	if (!accept(otBegin))
@@ -594,7 +594,7 @@ bool Translator::compound_operator()  // *
 	return true;
 }
 
-//<обязательный составной оператор>::= begin <оператор>{;<оператор>} end
+//<РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>::= begin <РѕРїРµСЂР°С‚РѕСЂ>{;<РѕРїРµСЂР°С‚РѕСЂ>} end
 void Translator::neccessary_compound_operator()  // *
 {
 	accept(otBegin);
@@ -609,7 +609,7 @@ void Translator::neccessary_compound_operator()  // *
 	accept(otEnd);
 }
 
-//<выбирающий оператор>::= if <выражение> then <оператор>|if <выражение> then <оператор> else <оператор>
+//<РІС‹Р±РёСЂР°СЋС‰РёР№ РѕРїРµСЂР°С‚РѕСЂ>::= if <РІС‹СЂР°Р¶РµРЅРёРµ> then <РѕРїРµСЂР°С‚РѕСЂ>|if <РІС‹СЂР°Р¶РµРЅРёРµ> then <РѕРїРµСЂР°С‚РѕСЂ> else <РѕРїРµСЂР°С‚РѕСЂ>
 bool Translator::if_operator()  // *
 {
 	/*
@@ -658,7 +658,7 @@ bool Translator::if_operator()  // *
 	return true;
 }
 
-//<оператор цикла>::= while <выражение> do <оператор>
+//<РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р°>::= while <РІС‹СЂР°Р¶РµРЅРёРµ> do <РѕРїРµСЂР°С‚РѕСЂ>
 bool Translator::while_operator()  // *
 {
 

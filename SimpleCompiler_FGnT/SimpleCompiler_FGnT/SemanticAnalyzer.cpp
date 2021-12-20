@@ -63,18 +63,18 @@ Type* SemanticAnalyzer::derive(Type* left, Type* right, OperatorType last_operat
 
 	if (is_string)
 	{
-		// только +, =, <>
+		// С‚РѕР»СЊРєРѕ +, =, <>
 		if (last_operation != otPlus && last_operation != otEqual && last_operation != otLessGreater)
 		{
-			error_text = "Данную операцию нельзя применить к этим операндам";
+			error_text = "Р”Р°РЅРЅСѓСЋ РѕРїРµСЂР°С†РёСЋ РЅРµР»СЊР·СЏ РїСЂРёРјРµРЅРёС‚СЊ Рє СЌС‚РёРј РѕРїРµСЂР°РЅРґР°Рј";
 			error_handler->add_error(error_text, position_for_error);
 		}
 	}
 	else
 	{
-		if (left->can_cast_to(available_types[dtString])|| right->can_cast_to(available_types[dtString])) // хотя бы один операнд - строковый
+		if (left->can_cast_to(available_types[dtString])|| right->can_cast_to(available_types[dtString])) // С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ РѕРїРµСЂР°РЅРґ - СЃС‚СЂРѕРєРѕРІС‹Р№
 		{
-			error_text = "Данную операцию нельзя применить к этим операндам";
+			error_text = "Р”Р°РЅРЅСѓСЋ РѕРїРµСЂР°С†РёСЋ РЅРµР»СЊР·СЏ РїСЂРёРјРµРЅРёС‚СЊ Рє СЌС‚РёРј РѕРїРµСЂР°РЅРґР°Рј";
 			error_handler->add_error(error_text, position_for_error);
 		}
 	}
@@ -93,7 +93,7 @@ void SemanticAnalyzer::add_var(VarName name, Type* dt)
 		variables[name] = dt;
 	else
 	{
-		string error_text = "Переменная с именем `" + name + "` уже была объявлена";
+		string error_text = "РџРµСЂРµРјРµРЅРЅР°СЏ СЃ РёРјРµРЅРµРј `" + name + "` СѓР¶Рµ Р±С‹Р»Р° РѕР±СЉСЏРІР»РµРЅР°";
 		error_handler->add_error(error_text, current_token->position);
 	}
 }
@@ -181,7 +181,7 @@ bool SemanticAnalyzer::accept(vector<OperatorType> operator_types)
 	return result;
 }
 
-void SemanticAnalyzer::program() // <программа>::=program <имя>(<имя файла>{,<имя файла>});<блок>.
+void SemanticAnalyzer::program() // <РїСЂРѕРіСЂР°РјРјР°>::=program <РёРјСЏ>(<РёРјСЏ С„Р°Р№Р»Р°>{,<РёРјСЏ С„Р°Р№Р»Р°>});<Р±Р»РѕРє>.
 {
 	accept(otProgram);
 	accept(ttIdentificator);
@@ -192,14 +192,14 @@ void SemanticAnalyzer::program() // <программа>::=program <имя>(<имя файла>{,<им
 	accept(otDot);
 }
 
-void SemanticAnalyzer::block() // <блок>::=<раздел констант><раздел типов><раздел переменных><раздел процедур и функций><раздел операторов>
+void SemanticAnalyzer::block() // <Р±Р»РѕРє>::=<СЂР°Р·РґРµР» РєРѕРЅСЃС‚Р°РЅС‚><СЂР°Р·РґРµР» С‚РёРїРѕРІ><СЂР°Р·РґРµР» РїРµСЂРµРјРµРЅРЅС‹С…><СЂР°Р·РґРµР» РїСЂРѕС†РµРґСѓСЂ Рё С„СѓРЅРєС†РёР№><СЂР°Р·РґРµР» РѕРїРµСЂР°С‚РѕСЂРѕРІ>
 {
 	vars_section();
 	operators_section();
 }
 
-// ======== Раздел переменных ========
-bool SemanticAnalyzer::single_var_definition() // <описание однотипных переменных>::=<имя>{,<имя>}:<тип>
+// ======== Р Р°Р·РґРµР» РїРµСЂРµРјРµРЅРЅС‹С… ========
+bool SemanticAnalyzer::single_var_definition() // <РѕРїРёСЃР°РЅРёРµ РѕРґРЅРѕС‚РёРїРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…>::=<РёРјСЏ>{,<РёРјСЏ>}:<С‚РёРї>
 {
 	vector<VarName> variableNames;
 	
@@ -225,7 +225,7 @@ bool SemanticAnalyzer::single_var_definition() // <описание однотипных переменны
 	return true;
 }
 
-Type* SemanticAnalyzer::type() // <тип>::=integer|real|string|char
+Type* SemanticAnalyzer::type() // <С‚РёРї>::=integer|real|string|char
 {
 	if (accept(otInteger))
 		return available_types[dtInt];
@@ -237,7 +237,7 @@ Type* SemanticAnalyzer::type() // <тип>::=integer|real|string|char
 		return available_types[dtChar];
 }
 
-void SemanticAnalyzer::vars_section() // <раздел переменных>::= var <описание однотипных переменных>;{<описание однотипных переменных>;} | <пусто>
+void SemanticAnalyzer::vars_section() // <СЂР°Р·РґРµР» РїРµСЂРµРјРµРЅРЅС‹С…>::= var <РѕРїРёСЃР°РЅРёРµ РѕРґРЅРѕС‚РёРїРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…>;{<РѕРїРёСЃР°РЅРёРµ РѕРґРЅРѕС‚РёРїРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…>;} | <РїСѓСЃС‚Рѕ>
 {
 	accept(otVar);
 
@@ -250,22 +250,22 @@ void SemanticAnalyzer::vars_section() // <раздел переменных>::= var <описание од
 	}
 }
 
-// ======== Раздел операторов ========
-// <раздел операторов>::= <составной оператор>
+// ======== Р Р°Р·РґРµР» РѕРїРµСЂР°С‚РѕСЂРѕРІ ========
+// <СЂР°Р·РґРµР» РѕРїРµСЂР°С‚РѕСЂРѕРІ>::= <СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>
 
 void SemanticAnalyzer::operators_section()
 {
 	neccessary_compound_operator();
 }
 
-//<оператор>::=<простой оператор>|<сложный оператор>
+//<РѕРїРµСЂР°С‚РѕСЂ>::=<РїСЂРѕСЃС‚РѕР№ РѕРїРµСЂР°С‚РѕСЂ>|<СЃР»РѕР¶РЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ>
 void SemanticAnalyzer::operator_()
 {
 	if (!simple_operator())
 		complex_operator();
 }
 
-//<простой оператор>::=<переменная>:=<выражение>
+//<РїСЂРѕСЃС‚РѕР№ РѕРїРµСЂР°С‚РѕСЂ>::=<РїРµСЂРµРјРµРЅРЅР°СЏ>:=<РІС‹СЂР°Р¶РµРЅРёРµ>
 bool SemanticAnalyzer::simple_operator() // *
 {
 	int mem_position = current_token->position;
@@ -279,15 +279,15 @@ bool SemanticAnalyzer::simple_operator() // *
 
 	if (variables.find(name) == variables.end())
 	{
-		string error_text = "Переменная не была объявлена";
+		string error_text = "РџРµСЂРµРјРµРЅРЅР°СЏ РЅРµ Р±С‹Р»Р° РѕР±СЉСЏРІР»РµРЅР°";
 		error_handler->add_error(error_text, mem_position);
 	}
 	else
 	{
 		if (!t->can_cast_to(variables[name]))
 		{
-			// TODO: вывод ошибки
-			string error_text = "Вычисленное выражение имеет другой тип в отличие от переменной";
+			// TODO: РІС‹РІРѕРґ РѕС€РёР±РєРё
+			string error_text = "Р’С‹С‡РёСЃР»РµРЅРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РёРјРµРµС‚ РґСЂСѓРіРѕР№ С‚РёРї РІ РѕС‚Р»РёС‡РёРµ РѕС‚ РїРµСЂРµРјРµРЅРЅРѕР№";
 			error_handler->add_error(error_text, get_last_position_of_operator[otAssign]);
 		}
 	}
@@ -295,7 +295,7 @@ bool SemanticAnalyzer::simple_operator() // *
 	return true;
 }
 
-//<выражение>::=<простое выражение>|<простое выражение><операция отношения><простое выражение>
+//<РІС‹СЂР°Р¶РµРЅРёРµ>::=<РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ>|<РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ><РѕРїРµСЂР°С†РёСЏ РѕС‚РЅРѕС€РµРЅРёСЏ><РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ>
 Type* SemanticAnalyzer::expression()
 {
 	Type *t1, *t2;
@@ -311,13 +311,13 @@ Type* SemanticAnalyzer::expression()
 	return t1;
 }
 
-//<операция отношения>::= =|<>|<|<=|>=|>
+//<РѕРїРµСЂР°С†РёСЏ РѕС‚РЅРѕС€РµРЅРёСЏ>::= =|<>|<|<=|>=|>
 bool SemanticAnalyzer::relation_operation()  // *
 {
 	return accept({ otEqual, otLessGreater, otLess, otLessEqual, otGreaterEqual, otGreater });
 }
 
-//<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
+//<РїСЂРѕСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ>::=<СЃР»Р°РіР°РµРјРѕРµ>{<Р°РґРґРёС‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ><СЃР»Р°РіР°РµРјРѕРµ>}
 Type* SemanticAnalyzer::simple_expression()
 {
 	Type* t1, * t2;
@@ -332,13 +332,13 @@ Type* SemanticAnalyzer::simple_expression()
 	return t1;
 }
 
-//<аддитивная операция>::= +|-|or
+//<Р°РґРґРёС‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ>::= +|-|or
 bool SemanticAnalyzer::additive_operation()  // *
 {
 	return accept({ otPlus, otMinus, otOr });
 }
 
-//<слагаемое>::=<множитель>{<мультипликативная операция><множитель>}
+//<СЃР»Р°РіР°РµРјРѕРµ>::=<РјРЅРѕР¶РёС‚РµР»СЊ>{<РјСѓР»СЊС‚РёРїР»РёРєР°С‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ><РјРЅРѕР¶РёС‚РµР»СЊ>}
 Type* SemanticAnalyzer::term()
 {
 	Type* t1, * t2;
@@ -354,16 +354,16 @@ Type* SemanticAnalyzer::term()
 	return t1;
 }
 
-//<мультипликативная операция>::=*|/|div|mod|and
+//<РјСѓР»СЊС‚РёРїР»РёРєР°С‚РёРІРЅР°СЏ РѕРїРµСЂР°С†РёСЏ>::=*|/|div|mod|and
 bool SemanticAnalyzer::multiplicative_operation()  // *
 {
 	return accept({ otStar, otSlash, otDiv, otMod, otAnd });
 }
 
-//<множитель>::=[<знак>]<переменная>|[<знак>]<константа>|[<знак>](<выражение>)|not <множитель>
+//<РјРЅРѕР¶РёС‚РµР»СЊ>::=[<Р·РЅР°Рє>]<РїРµСЂРµРјРµРЅРЅР°СЏ>|[<Р·РЅР°Рє>]<РєРѕРЅСЃС‚Р°РЅС‚Р°>|[<Р·РЅР°Рє>](<РІС‹СЂР°Р¶РµРЅРёРµ>)|not <РјРЅРѕР¶РёС‚РµР»СЊ>
 Type* SemanticAnalyzer::factor()
 {
-	// TODO: сделать что-то со знаком...
+	// TODO: СЃРґРµР»Р°С‚СЊ С‡С‚Рѕ-С‚Рѕ СЃРѕ Р·РЅР°РєРѕРј...
 	if (sign())
 	{
 		//...
@@ -376,7 +376,7 @@ Type* SemanticAnalyzer::factor()
 	{
 		if (variables.find(name) == variables.end())
 		{
-			string error_text = "Переменная не была объявлена";
+			string error_text = "РџРµСЂРµРјРµРЅРЅР°СЏ РЅРµ Р±С‹Р»Р° РѕР±СЉСЏРІР»РµРЅР°";
 			error_handler->add_error(error_text, mem_position);
 			return new Type();
 		}
@@ -399,9 +399,9 @@ Type* SemanticAnalyzer::factor()
 
 		if (!t->can_cast_to(available_types[dtBool]))
 		{
-			string error_text = "Выражение должно иметь тип Bool";
+			string error_text = "Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ С‚РёРї Bool";
 			error_handler->add_error(error_text, get_last_position_of_operator[otNot]);
-			// TODO: ошибка
+			// TODO: РѕС€РёР±РєР°
 		}
 
 		return available_types[dtBool];
@@ -409,13 +409,13 @@ Type* SemanticAnalyzer::factor()
 
 }
 
-//<знак>::= +|-
+//<Р·РЅР°Рє>::= +|-
 bool SemanticAnalyzer::sign()  // *
 {
 	return accept({ otPlus, otMinus });
 }
 
-//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>|<врайтлайн>
+//<СЃР»РѕР¶РЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ>::=<СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>|<РІС‹Р±РёСЂР°СЋС‰РёР№ РѕРїРµСЂР°С‚РѕСЂ>|<РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р°>|<РІСЂР°Р№С‚Р»Р°Р№РЅ>
 void SemanticAnalyzer::complex_operator()
 {
 	if (compound_operator())
@@ -440,7 +440,7 @@ void SemanticAnalyzer::complex_operator()
 	}
 }
 
-//<составной оператор>::= begin <оператор>{;<оператор>} end
+//<СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>::= begin <РѕРїРµСЂР°С‚РѕСЂ>{;<РѕРїРµСЂР°С‚РѕСЂ>} end
 bool SemanticAnalyzer::compound_operator()  // *
 {
 	if (!accept(otBegin))
@@ -458,7 +458,7 @@ bool SemanticAnalyzer::compound_operator()  // *
 	return true;
 }
 
-//<обязательный составной оператор>::= begin <оператор>{;<оператор>} end
+//<РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ СЃРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ>::= begin <РѕРїРµСЂР°С‚РѕСЂ>{;<РѕРїРµСЂР°С‚РѕСЂ>} end
 void SemanticAnalyzer::neccessary_compound_operator()  // *
 {
 	accept(otBegin);
@@ -473,7 +473,7 @@ void SemanticAnalyzer::neccessary_compound_operator()  // *
 	accept(otEnd);
 }
 
-//<выбирающий оператор>::= if <выражение> then <оператор>|if <выражение> then <оператор> else <оператор>
+//<РІС‹Р±РёСЂР°СЋС‰РёР№ РѕРїРµСЂР°С‚РѕСЂ>::= if <РІС‹СЂР°Р¶РµРЅРёРµ> then <РѕРїРµСЂР°С‚РѕСЂ>|if <РІС‹СЂР°Р¶РµРЅРёРµ> then <РѕРїРµСЂР°С‚РѕСЂ> else <РѕРїРµСЂР°С‚РѕСЂ>
 bool SemanticAnalyzer::if_operator()  // *
 {
 	if (!accept(otIf))
@@ -483,9 +483,9 @@ bool SemanticAnalyzer::if_operator()  // *
 
 	if (!t->can_cast_to(available_types[dtBool]))
 	{
-		string error_text = "Выражение должно иметь тип Bool";
+		string error_text = "Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ С‚РёРї Bool";
 		error_handler->add_error(error_text, current_token->position);
-		// TODO: ошибка
+		// TODO: РѕС€РёР±РєР°
 	}
 
 	accept(otThen);
@@ -497,7 +497,7 @@ bool SemanticAnalyzer::if_operator()  // *
 	return true;
 }
 
-//<оператор цикла>::= while <выражение> do <оператор>
+//<РѕРїРµСЂР°С‚РѕСЂ С†РёРєР»Р°>::= while <РІС‹СЂР°Р¶РµРЅРёРµ> do <РѕРїРµСЂР°С‚РѕСЂ>
 bool SemanticAnalyzer::while_operator()  // *
 {
 	if (!accept(otWhile))
@@ -506,9 +506,9 @@ bool SemanticAnalyzer::while_operator()  // *
 	Type* t = expression();
 	if (!t->can_cast_to(available_types[dtBool]))
 	{
-		string error_text = "Выражение должно иметь тип Bool";
+		string error_text = "Р’С‹СЂР°Р¶РµРЅРёРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ С‚РёРї Bool";
 		error_handler->add_error(error_text, current_token->position);
-		// TODO: ошибка
+		// TODO: РѕС€РёР±РєР°
 	}
 
 	accept(otDo);
@@ -542,7 +542,7 @@ bool SemanticAnalyzer::readln()
 	{
 		if (variables.find(name) == variables.end())
 		{
-			string error_text = "Переменная не была объявлена";
+			string error_text = "РџРµСЂРµРјРµРЅРЅР°СЏ РЅРµ Р±С‹Р»Р° РѕР±СЉСЏРІР»РµРЅР°";
 			error_handler->add_error(error_text, mem_position);
 		}
 	}

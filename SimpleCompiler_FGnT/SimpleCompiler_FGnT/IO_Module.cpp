@@ -69,7 +69,7 @@ void IO_Module::write_errors(ErrorHandler* error_handler)
 	char c;
 	do
 	{
-		// Построчно будем искать позиция с ошибками
+		// РџРѕСЃС‚СЂРѕС‡РЅРѕ Р±СѓРґРµРј РёСЃРєР°С‚СЊ РїРѕР·РёС†РёСЏ СЃ РѕС€РёР±РєР°РјРё
 		int current_position_in_line = 0;
 		ErrorHandler* error_handler_in_line = new ErrorHandler();
 
@@ -79,7 +79,7 @@ void IO_Module::write_errors(ErrorHandler* error_handler)
 		{
 			c = io_helper->get_next_char();
 
-			// Если еще есть ошибки и на текущей позиции есть ошибка, тогда добавим ее
+			// Р•СЃР»Рё РµС‰Рµ РµСЃС‚СЊ РѕС€РёР±РєРё Рё РЅР° С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё РµСЃС‚СЊ РѕС€РёР±РєР°, С‚РѕРіРґР° РґРѕР±Р°РІРёРј РµРµ
 			if (current_error < errors.size() &&
 				errors[current_error]->position == io_helper->get_current_position())
 			{
@@ -97,9 +97,9 @@ void IO_Module::write_errors(ErrorHandler* error_handler)
 
 		int errors_count_in_line = errors_in_line.size();
 		if (errors_count_in_line == 0) continue;
-		// Если в строке были ошибки то создадим первую строку типа:
+		// Р•СЃР»Рё РІ СЃС‚СЂРѕРєРµ Р±С‹Р»Рё РѕС€РёР±РєРё С‚Рѕ СЃРѕР·РґР°РґРёРј РїРµСЂРІСѓСЋ СЃС‚СЂРѕРєСѓ С‚РёРїР°:
 		// ^             ^         ^
-		// Указатели на позиции ошибок
+		// РЈРєР°Р·Р°С‚РµР»Рё РЅР° РїРѕР·РёС†РёРё РѕС€РёР±РѕРє
 
 		for (auto e : errors_in_line)
 			first_line[e->position] = '^';
@@ -109,16 +109,16 @@ void IO_Module::write_errors(ErrorHandler* error_handler)
 
 		for (int i = errors_count_in_line - 1; i >= 0; i--)
 		{
-			// Обрежем первую строку до нужной позиции, т.к. на предыдущих итерациях мы уже обработали некоторые ошибки
+			// РћР±СЂРµР¶РµРј РїРµСЂРІСѓСЋ СЃС‚СЂРѕРєСѓ РґРѕ РЅСѓР¶РЅРѕР№ РїРѕР·РёС†РёРё, С‚.Рє. РЅР° РїСЂРµРґС‹РґСѓС‰РёС… РёС‚РµСЂР°С†РёСЏС… РјС‹ СѓР¶Рµ РѕР±СЂР°Р±РѕС‚Р°Р»Рё РЅРµРєРѕС‚РѕСЂС‹Рµ РѕС€РёР±РєРё
 			string line = first_line.substr(0, errors_in_line[i]->position);
-			// заменим на палочки, так красивее....
+			// Р·Р°РјРµРЅРёРј РЅР° РїР°Р»РѕС‡РєРё, С‚Р°Рє РєСЂР°СЃРёРІРµРµ....
 			for (int j = 0; j < line.size(); j++)
 			{
 				if (line[j] == '^')
 					line[j] = '|';
 			}
 
-			// текущая ошибка всегда в конце строки, поэтому просто добавим описание ошибки в конец строки
+			// С‚РµРєСѓС‰Р°СЏ РѕС€РёР±РєР° РІСЃРµРіРґР° РІ РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё, РїРѕСЌС‚РѕРјСѓ РїСЂРѕСЃС‚Рѕ РґРѕР±Р°РІРёРј РѕРїРёСЃР°РЅРёРµ РѕС€РёР±РєРё РІ РєРѕРЅРµС† СЃС‚СЂРѕРєРё
 			line += errors_in_line[i]->info;
 			line += '\n';
 
@@ -147,7 +147,7 @@ void IO_Module::write_errors(ErrorHandler* error_handler)
 
 string IO_Module::change_filename(string& path)
 {
-	// попытаемся найти где начинается extension
+	// РїРѕРїС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё РіРґРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ extension
 	string result;
 	auto pos = path.rfind(".");
 	if (pos == string::npos)

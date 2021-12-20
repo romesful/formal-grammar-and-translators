@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "SyntaxAnalyzer.h"
 
 SyntaxAnalyzer::SyntaxAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler)
