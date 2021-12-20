@@ -1,4 +1,5 @@
-﻿#include "SyntaxAnalyzer.h"
+﻿#include "pch.h"
+#include "SyntaxAnalyzer.h"
 
 SyntaxAnalyzer::SyntaxAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler)
 {
@@ -31,7 +32,7 @@ void SyntaxAnalyzer::next_token()
 	current_token_position++;
 }
 
-bool SyntaxAnalyzer::accept(TokenType token_type, bool is_necessarily)
+bool SyntaxAnalyzer::accept(TType token_type, bool is_necessarily)
 {
 	bool result = true;
 	if (current_token->token_type != token_type)
@@ -41,7 +42,7 @@ bool SyntaxAnalyzer::accept(TokenType token_type, bool is_necessarily)
 	else if (is_necessarily) // выводим ошибку
 	{
 		string error_text = "";
-		switch (current_token->token_type)
+		switch (token_type)
 		{
 			case ttIdentificator:
 				error_text = "Ожидалось имя идентификатора";
@@ -224,7 +225,7 @@ void SyntaxAnalyzer::expression()
 //<операция отношения>::= =|<>|<|<=|>=|>
 bool SyntaxAnalyzer::relation_operation()  // *
 {
-	return accept({ otEqual, otLessGreater, otLessEqual, otGreaterEqual, otGreater });
+	return accept({ otEqual, otLessGreater, otLess, otLessEqual, otGreaterEqual, otGreater });
 }
 
 //<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
@@ -295,7 +296,7 @@ bool SyntaxAnalyzer::sign()  // *
 	return accept({ otPlus, otMinus });
 }
 
-//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>
+//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>|<врайтлайн>
 void SyntaxAnalyzer::complex_operator()
 {
 	if (compound_operator())
@@ -307,6 +308,14 @@ void SyntaxAnalyzer::complex_operator()
 		//...
 	}
 	else if (while_operator())
+	{
+		//...
+	}
+	else if (writeln())
+	{
+		//...
+	}
+	else if (readln())
 	{
 		//...
 	}
@@ -373,6 +382,33 @@ bool SyntaxAnalyzer::while_operator()  // *
 
 	return true;
 }
+
+//<врайтлайн>::= writeln(<выражение>)
+bool SyntaxAnalyzer::writeln()
+{
+	if (!accept(otWriteLn))
+		return false;
+
+	accept(otLeftParenthesis, true);
+	expression();
+	accept(otRightParenthesis, true);
+
+	return true;
+}
+
+//<риделайн>::= readln(<переменная>)
+bool SyntaxAnalyzer::readln()
+{
+	if (!accept(otReadLn))
+		return false;
+
+	accept(otLeftParenthesis, true);
+	accept(ttIdentificator, true);
+	accept(otRightParenthesis, true);
+
+	return true;
+}
+
 
 /*
 

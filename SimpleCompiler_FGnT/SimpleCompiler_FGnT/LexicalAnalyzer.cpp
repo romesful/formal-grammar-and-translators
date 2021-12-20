@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "LexicalAnalyzer.h"
 
 LexicalAnalyzer::LexicalAnalyzer(IO_Module* _io, ErrorHandler* _error_handler)
@@ -85,7 +86,10 @@ Token* LexicalAnalyzer::get_token()
 		char lexem = io->get_next_char();
 		c = io->get_next_char();
 		if (c != '\'') // ошибка
-			throw;
+		{
+			string error_text = "Ожидалася символ '";
+			error_handler->add_error(error_text, io->get_current_position());
+		}
 		else
 		{
 			c = io->get_next_char();
@@ -169,11 +173,6 @@ Token* LexicalAnalyzer::get_token()
 		return new OperatorToken(ttOperator, ot, position);
 
 	}
-}
-
-int LexicalAnalyzer::get_current_position()
-{
-	return position;
 }
 
 bool LexicalAnalyzer::check()

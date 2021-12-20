@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ErrorHandler.h"
 
 void ErrorHandler::add_error(string& info, int position)
@@ -11,7 +12,7 @@ vector<Error*> ErrorHandler::get_errors()
 	return errors;
 }
 
-inline int ErrorHandler::get_errors_count()
+int ErrorHandler::get_errors_count()
 {
 	return errors.size();
 }

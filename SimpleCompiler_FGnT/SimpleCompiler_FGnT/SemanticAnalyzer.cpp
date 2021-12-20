@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SemanticAnalyzer.h"
 
 SemanticAnalyzer::SemanticAnalyzer(vector<Token*> _tokens, ErrorHandler* _error_handler)
@@ -126,7 +127,7 @@ Type* SemanticAnalyzer::get_type_from_const_token(Token* token)
 	return new Type();
 }
 
-bool SemanticAnalyzer::accept(TokenType token_type)
+bool SemanticAnalyzer::accept(TType token_type)
 {
 	bool result = true;
 	if (current_token->token_type != token_type)
@@ -313,7 +314,7 @@ Type* SemanticAnalyzer::expression()
 //<операция отношения>::= =|<>|<|<=|>=|>
 bool SemanticAnalyzer::relation_operation()  // *
 {
-	return accept({ otEqual, otLessGreater, otLessEqual, otGreaterEqual, otGreater });
+	return accept({ otEqual, otLessGreater, otLess, otLessEqual, otGreaterEqual, otGreater });
 }
 
 //<простое выражение>::=<слагаемое>{<аддитивная операция><слагаемое>}
@@ -414,7 +415,7 @@ bool SemanticAnalyzer::sign()  // *
 	return accept({ otPlus, otMinus });
 }
 
-//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>
+//<сложный оператор>::=<составной оператор>|<выбирающий оператор>|<оператор цикла>|<врайтлайн>
 void SemanticAnalyzer::complex_operator()
 {
 	if (compound_operator())
@@ -426,6 +427,14 @@ void SemanticAnalyzer::complex_operator()
 		//...
 	}
 	else if (while_operator())
+	{
+		//...
+	}
+	else if (writeln())
+	{
+		//...
+	}
+	else if (readln())
 	{
 		//...
 	}
@@ -504,6 +513,40 @@ bool SemanticAnalyzer::while_operator()  // *
 
 	accept(otDo);
 	operator_();
+
+	return true;
+}
+
+bool SemanticAnalyzer::writeln()
+{
+	if (!accept(otWriteLn))
+		return false;
+
+	accept(otLeftParenthesis);
+	expression();
+	accept(otRightParenthesis);
+
+	return true;
+}
+
+bool SemanticAnalyzer::readln()
+{
+	if (!accept(otReadLn))
+		return false;
+
+	accept(otLeftParenthesis);
+	VarName name = get_var_name_from_token(current_token);
+	Type* const_type = get_type_from_const_token(current_token);
+	int mem_position = current_token->position;
+	if (accept(ttIdentificator))
+	{
+		if (variables.find(name) == variables.end())
+		{
+			string error_text = "Переменная не была объявлена";
+			error_handler->add_error(error_text, mem_position);
+		}
+	}
+	accept(otRightParenthesis);
 
 	return true;
 }

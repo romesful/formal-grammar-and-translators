@@ -3,7 +3,7 @@
 
 using namespace std;
 
-enum TokenType {
+enum TType {
 	ttIdentificator,
 	ttOperator,
 	ttConst,
@@ -81,7 +81,10 @@ enum OperatorType {
 	otChar,					// char
 
 	otTrue,					// true
-	otFalse					// false
+	otFalse,				// false
+
+	otWriteLn,				// writeln
+	otReadLn				// readln
 };
 
 enum DataType {
@@ -94,9 +97,9 @@ enum DataType {
 
 class Token {
 public:
-	TokenType token_type;
+	TType token_type;
 	int position;
-	Token(TokenType token_type, int position)
+	Token(TType token_type, int position)
 	{
 		this->token_type = token_type;
 		this->position = position;
@@ -107,7 +110,7 @@ public:
 class OperatorToken : public Token {
 public:
 	OperatorType operator_type;
-	OperatorToken(TokenType token_type, OperatorType operator_type, int position) : Token(token_type, position)
+	OperatorToken(TType token_type, OperatorType operator_type, int position) : Token(token_type, position)
 	{
 		this->operator_type = operator_type;
 	}
@@ -116,7 +119,7 @@ public:
 class IdentificatorToken : public Token {
 public:
 	string name;
-	IdentificatorToken(TokenType token_type, string name, int position) : Token(token_type, position)
+	IdentificatorToken(TType token_type, string name, int position) : Token(token_type, position)
 	{
 		this->name = name;
 	}
@@ -127,7 +130,7 @@ class ConstToken : public Token {
 public:
 	T value;
 	DataType data_type;
-	ConstToken(TokenType token_type, T value, DataType data_type, int position) : Token(token_type, position)
+	ConstToken(TType token_type, T value, DataType data_type, int position) : Token(token_type, position)
 	{
 		this->value = value;
 		this->data_type = data_type;

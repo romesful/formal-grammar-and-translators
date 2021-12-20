@@ -39,7 +39,7 @@ private:
 	VarName get_var_name_from_token(Token* token);
 	Type* get_type_from_const_token(Token* token);
 
-	bool accept(TokenType token_type);
+	bool accept(TType token_type);
 	bool accept(OperatorType operator_type);
 	bool accept(vector<OperatorType> operator_types);
 
@@ -69,6 +69,6 @@ private:
 	bool compound_operator();
 	bool if_operator();
 	bool while_operator();
+	bool writeln();
+	bool readln();
 };
-
-#include "SemanticAnalyzer.cpp"

@@ -23,11 +23,8 @@ public:
 	~LexicalAnalyzer();
 private:
 	Token* get_token();
-	int get_current_position();
 
 	vector<Token*> tokens;
 	int position = 0;
 	char c;
 };
-
-#include "LexicalAnalyzer.cpp"

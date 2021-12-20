@@ -19,7 +19,7 @@ private:
 
 	void next_token();
 
-	bool accept(TokenType token_type, bool is_necessarily = false);
+	bool accept(TType token_type, bool is_necessarily = false);
 	bool accept(OperatorType operator_type, bool is_necessarily = false);
 	bool accept(vector<OperatorType> operator_types, bool is_necessarily = false);
 
@@ -50,6 +50,6 @@ private:
 	bool compound_operator();
 	bool if_operator();
 	bool while_operator();
+	bool writeln();
+	bool readln();
 };
-
-#include "SyntaxAnalyzer.cpp"

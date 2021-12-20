@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "IO_Module.h"
 
 IO_Module::IO_Module(const string& input)
@@ -9,6 +10,10 @@ IO_Module::IO_Module(const string& input)
 		open_state = ByFile;
 	}
 	catch (exception e)
+	{
+		cout << e.what() << endl;
+	}
+	if (!input_stream.is_open())
 	{
 		code = input;
 		open_state = ByString;
@@ -147,10 +152,10 @@ string IO_Module::change_filename(string& path)
 	auto pos = path.rfind(".");
 	if (pos == string::npos)
 	{
-		return path + OUTPUT_POSTFIX;
+		return path + OUTPUT_PREFIX;
 	}
 
-	result = path.substr(0, pos) + "_" + OUTPUT_POSTFIX + path.substr(pos);
+	result = path.substr(0, pos) + "_" + OUTPUT_PREFIX + path.substr(pos);
 
 	return result;
 }

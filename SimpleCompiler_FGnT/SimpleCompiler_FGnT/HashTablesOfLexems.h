@@ -46,8 +46,12 @@ const map<string, OperatorType> OperatorKeyWords = {
 	{"real", otReal},
 	{"string", otString},
 	{"char", otChar},
+
 	{"true", otTrue},
-	{"false", otFalse}
+	{"false", otFalse},
+
+	{"writeln", otWriteLn},
+	{"readln", otReadLn}
 };
 
 const map<string, OperatorType> OperatorSymbols = {
@@ -131,11 +135,13 @@ const map<OperatorType, string> KeyWordByOperator = {
 	{otRightBracket, "]"},
 	{otLessGreater, "<>"},
 	{otTrue, "true"},
-	{otFalse, "false"}
+	{otFalse, "false"},
+	{otWriteLn, "writeln"},
+	{otReadLn, "readln"}
 };
 /*
 
-enum TokenType {
+enum TType {
 	ttIdentificator,
 	ttOperator,
 	ttConst
