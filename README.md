@@ -6,7 +6,31 @@
 - Синтаксический анализатор
 - Семантический анализатор
 
-Пример работы программы:
+Пример сгенерированной программы:
+```Pascal
+program isprime;
+var x,i,c:integer;
+begin
+	writeln("Vvedite chislo");
+	readln(x);
+	c:=0;
+	i:=2;
+	while (i < x) do
+	begin
+		if (x mod i = 0) then
+			c := c + 1;
+		i := i+1
+	end;
+	if (c > 0) then
+		writeln("Sostavnoe")
+	else
+		writeln("Prostoe")
+end.
+```
+### Компиляция и выполнение программы
+![Пример программы](https://github.com/romesful/formal-grammar-and-translators/blob/master/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B%20-%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D1%87%D0%B8%D1%81%D0%BB%D0%B0%20%D0%BD%D0%B0%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%BE%D1%82%D1%83.gif?raw=true)
+
+Пример вывода программы, если в ней есть какие-либо ошибки:
 ```Pascal
 program mfdsain;
 var x:integer; y:char;
